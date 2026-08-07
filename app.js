@@ -8,13 +8,26 @@ const PORT = 3000;
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 
+// Middleware
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+
 // Static Folder
 app.use(express.static(path.join(__dirname, "public")));
 
 // Routes
 const webRoutes = require("./routes/web");
-app.use("/", webRoutes);
+const apiRoutes = require("./routes/api");
 
+app.use("/", webRoutes);
+app.use("/api", apiRoutes);
+
+// 404
+app.use((req, res) => {
+    res.status(404).render("notfound");
+});
+
+// Running Server
 app.listen(PORT, () => {
-    console.log(`Server berjalan di http://localhost:${PORT}`);
+    console.log(`🚀 Server berjalan di http://localhost:${PORT}`);
 });

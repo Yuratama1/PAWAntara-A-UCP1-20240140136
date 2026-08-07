@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Produk</title>
+</head>
+
+<body>
+
+<%- include("partials/navbar") %>
+
+<main>
+
+<h1>Daftar Produk</h1>
+
+<table border="1">
+
+<tr>
+
+<th>ID</th>
+<th>Nama</th>
+<th>Kategori</th>
+<th>Harga</th>
+<th>Stok</th>
+<th>Aksi</th>
+
+</tr>
+
+<% products.forEach(product => { %>
+
+<tr>
+
+<td><%= product.id %></td>
+
+<td><%= product.name %></td>
+
+<td><%= product.category %></td>
+
+<td>Rp <%= product.price %></td>
+
+<td><%= product.stock %></td>
+
+<td>
+
+<a href="/produk/<%= product.id %>">
+
+Detail
+
+</a>
+
+</td>
+
+</tr>
+
+<% }) %>
+
+</table>
+
+</main>
+
+<%- include("partials/footer") %>
+
+</body>
+</html>

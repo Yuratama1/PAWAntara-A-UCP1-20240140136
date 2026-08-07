@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+
+<meta charset="UTF-8">
+
+<title>Detail Produk</title>
+
+</head>
+
+<body>
+
+<%- include("partials/navbar") %>
+
+<main>
+
+<h1><%= product.name %></h1>
+
+<p>Kategori : <%= product.category %></p>
+
+<p>Harga : Rp <%= product.price %></p>
+
+<p>Stok : <%= product.stock %></p>
+
+<a href="/produk">
+
+Kembali
+
+</a>
+
+</main>
+
+<%- include("partials/footer") %>
+
+</body>
+
+</html>

@@ -17,6 +17,30 @@
             Menjual kebutuhan pokok dengan harga terbaik.
         </p>
     </section>
+
+    <section>
+
+<h2>Preview Produk</h2>
+
+<% products.forEach(product => { %>
+
+<div>
+
+<h3><%= product.name %></h3>
+
+<p>Rp <%= product.price %></p>
+
+<a href="/produk/<%= product.id %>">
+
+Lihat Detail
+
+</a>
+
+</div>
+
+<% }) %>
+
+</section>
 </main>
 
 <%- include("partials/footer") %>
