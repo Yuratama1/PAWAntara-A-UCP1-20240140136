@@ -1,22 +1,262 @@
+/* ===========================
+   GLOBAL
+=========================== */
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
 body{
-    background:#f8f9fa;
+    font-family: "Poppins", sans-serif;
+    background:#f5f7fa;
+    color:#333;
 }
 
-.hero{
-    background:#198754;
-    color:white;
-    padding:80px 0;
+/* ===========================
+   NAVBAR
+=========================== */
+
+.navbar{
+    box-shadow:0 4px 10px rgba(0,0,0,.15);
 }
 
-.card img{
-    height:220px;
-    object-fit:cover;
+.navbar-brand{
+    font-size:1.5rem;
+    font-weight:700;
 }
 
-.card{
+.nav-link{
     transition:.3s;
 }
 
+.nav-link:hover{
+    color:#ffc107 !important;
+}
+
+/* ===========================
+   HERO
+=========================== */
+
+.hero{
+
+    background:linear-gradient(135deg,#198754,#20c997);
+
+    color:white;
+
+    padding:100px 0;
+
+    border-radius:0 0 30px 30px;
+
+    margin-bottom:40px;
+}
+
+.hero h1{
+
+    font-size:3rem;
+
+    font-weight:700;
+
+}
+
+.hero p{
+
+    font-size:1.2rem;
+
+    margin:20px 0;
+
+}
+
+.hero .btn{
+
+    padding:12px 35px;
+
+    border-radius:50px;
+
+    font-size:18px;
+
+}
+
+/* ===========================
+   CARD
+=========================== */
+
+.card{
+
+    border:none;
+
+    border-radius:20px;
+
+    overflow:hidden;
+
+    transition:.35s;
+
+}
+
 .card:hover{
-    transform:translateY(-5px);
+
+    transform:translateY(-10px);
+
+    box-shadow:0 15px 35px rgba(0,0,0,.2);
+
+}
+
+.card img{
+
+    height:240px;
+
+    object-fit:cover;
+
+}
+
+.card-body{
+
+    padding:25px;
+
+}
+
+.card-title{
+
+    font-weight:700;
+
+}
+
+.card p{
+
+    margin-bottom:8px;
+
+}
+
+.card .btn{
+
+    border-radius:30px;
+
+}
+
+/* ===========================
+   DETAIL
+=========================== */
+
+.detail-img{
+
+    border-radius:20px;
+
+    box-shadow:0 8px 20px rgba(0,0,0,.2);
+
+}
+
+.detail-price{
+
+    font-size:30px;
+
+    font-weight:bold;
+
+    color:#198754;
+
+}
+
+/* ===========================
+   FORM FILTER
+=========================== */
+
+form{
+
+    margin-bottom:40px;
+
+}
+
+.form-control,
+
+.form-select{
+
+    height:50px;
+
+    border-radius:12px;
+
+}
+
+.btn-success{
+
+    height:50px;
+
+    border-radius:12px;
+
+}
+
+/* ===========================
+   FOOTER
+=========================== */
+
+footer{
+
+    margin-top:80px;
+
+    background:#198754;
+
+    color:white;
+
+}
+
+footer p{
+
+    margin:0;
+
+    padding:20px;
+
+}
+
+/* ===========================
+   ANIMATION
+=========================== */
+
+.fade-up{
+
+    animation:fadeUp .8s ease;
+}
+
+@keyframes fadeUp{
+
+    from{
+
+        opacity:0;
+
+        transform:translateY(30px);
+
+    }
+
+    to{
+
+        opacity:1;
+
+        transform:translateY(0);
+
+    }
+
+}
+
+/* ===========================
+   RESPONSIVE
+=========================== */
+
+@media(max-width:768px){
+
+.hero{
+
+padding:70px 20px;
+
+}
+
+.hero h1{
+
+font-size:2rem;
+
+}
+
+.card img{
+
+height:200px;
+
+}
+
 }
