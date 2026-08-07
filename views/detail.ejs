@@ -13,21 +13,61 @@
 
 <%- include("partials/navbar") %>
 
-<main>
+<main class="container py-5">
 
-<h1><%= product.name %></h1>
+<div class="row">
 
-<p>Kategori : <%= product.category %></p>
+<div class="col-md-5">
 
-<p>Harga : Rp <%= product.price %></p>
+<img
+src="<%= product.image %>"
+class="img-fluid rounded shadow">
 
-<p>Stok : <%= product.stock %></p>
+</div>
 
-<a href="/produk">
+<div class="col-md-7">
+
+<h2>
+
+<%= product.name %>
+
+</h2>
+
+<hr>
+
+<p>
+
+<strong>Kategori :</strong>
+
+<%= product.category %>
+
+</p>
+
+<p>
+
+<strong>Harga :</strong>
+
+Rp <%= product.price.toLocaleString("id-ID") %>
+
+</p>
+
+<p>
+
+<strong>Stok :</strong>
+
+<%= product.stock %>
+
+</p>
+
+<a href="/produk" class="btn btn-secondary">
 
 Kembali
 
 </a>
+
+</div>
+
+</div>
 
 </main>
 
