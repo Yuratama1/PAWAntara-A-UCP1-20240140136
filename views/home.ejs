@@ -10,37 +10,79 @@
 <%- include("partials/navbar") %>
 
 <main>
-    <section>
-        <h1>Selamat Datang di Toko Sembako Ariesta</h1>
 
-        <p>
-            Menjual kebutuhan pokok dengan harga terbaik.
-        </p>
-    </section>
+<section class="hero">
 
-    <section>
+<div class="container py-5 text-center">
 
-<h2>Preview Produk</h2>
+<h1 class="display-4 fw-bold">
 
-<% products.forEach(product => { %>
+Selamat Datang di Toko Sembako Ariesta
 
-<div>
+</h1>
 
-<h3><%= product.name %></h3>
+<p class="lead">
 
-<p>Rp <%= product.price %></p>
+Belanja kebutuhan pokok menjadi lebih mudah.
 
-<a href="/produk/<%= product.id %>">
+</p>
 
-Lihat Detail
+<a href="/produk" class="btn btn-success btn-lg">
+
+Lihat Produk
 
 </a>
 
 </div>
 
+</section>
+
+<section class="container mt-5">
+
+<h2 class="mb-4">
+
+Produk Terbaru
+
+</h2>
+
+<div class="row">
+
+<% products.forEach(product=>{ %>
+
+<div class="col-md-4 mb-4">
+
+<div class="card h-100 shadow">
+
+<img src="<%= product.image %>" class="card-img-top">
+
+<div class="card-body">
+
+<h5><%= product.name %></h5>
+
+<p>
+
+Rp <%= product.price.toLocaleString("id-ID") %>
+
+</p>
+
+<a href="/produk/<%= product.id %>" class="btn btn-success">
+
+Detail
+
+</a>
+
+</div>
+
+</div>
+
+</div>
+
 <% }) %>
 
+</div>
+
 </section>
+
 </main>
 
 <%- include("partials/footer") %>

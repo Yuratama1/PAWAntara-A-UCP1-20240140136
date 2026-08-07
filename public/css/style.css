@@ -1,0 +1,22 @@
+body{
+    background:#f8f9fa;
+}
+
+.hero{
+    background:#198754;
+    color:white;
+    padding:80px 0;
+}
+
+.card img{
+    height:220px;
+    object-fit:cover;
+}
+
+.card{
+    transition:.3s;
+}
+
+.card:hover{
+    transform:translateY(-5px);
+}
