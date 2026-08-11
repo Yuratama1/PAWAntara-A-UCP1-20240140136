@@ -1,262 +1,91 @@
-/* ===========================
-   GLOBAL
-=========================== */
-
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
+/* =========================================================
+   TOKO SEMBAKO ARIESTA — GLOBAL DESIGN SYSTEM
+   Clean • Fresh • Friendly UMKM Grocery
+   ========================================================= */
+:root{
+  --green:#1f7a4d;
+  --green-dark:#145c39;
+  --green-soft:#eaf7ef;
+  --orange:#f59e0b;
+  --orange-soft:#fff5dc;
+  --cream:#fffaf0;
+  --surface:#ffffff;
+  --ink:#1f2937;
+  --muted:#6b7280;
+  --line:#e7e5df;
+  --danger:#dc2626;
+  --shadow:0 12px 35px rgba(31,41,55,.07);
+  --radius:18px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;background:var(--cream);color:var(--ink);line-height:1.6}
+a{text-decoration:none;color:inherit}
+img{max-width:100%;display:block}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+.container-global{width:min(1180px,100%);margin:0 auto;padding-left:22px;padding-right:22px}
+.page-shell{min-height:calc(100vh - 160px)}
+.text-green{color:var(--green)!important}
+.bg-green{background:var(--green)!important}
+.product-grid{align-items:stretch}
+.product-card{transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease}
+.product-card:hover{transform:translateY(-5px);box-shadow:var(--shadow);border-color:#cfe7d8!important}
+.product-image{transition:transform .3s ease}
+.product-card:hover .product-image{transform:scale(1.03)}
+.primary-btn,.secondary-btn{transition:all .2s ease}
+.primary-btn:hover{background:var(--green-dark)!important;transform:translateY(-1px)}
+.secondary-btn:hover{border-color:var(--green)!important;color:var(--green)!important}
+.input-ui:focus{border-color:var(--green)!important;box-shadow:0 0 0 4px rgba(31,122,77,.10);outline:none}
+.ai-bubble{animation:fadeUp .25s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+.nav-mobile{display:none}
+.mobile-menu{display:flex}
+.hero-visual{position:relative}
+.badge-float{position:absolute}
+@media(max-width:900px){
+  .hero-grid{grid-template-columns:1fr!important}
+  .hero-visual{min-height:320px!important}
+  .feature-grid{grid-template-columns:1fr 1fr!important}
+  .product-grid{grid-template-columns:repeat(2,1fr)!important}
+  .footer-grid{grid-template-columns:1.5fr 1fr!important}
+}
+@media(max-width:700px){
+  .container-global{padding-left:16px;padding-right:16px}
+  .nav-desktop{display:none!important}
+  .nav-mobile{display:flex!important}
+  .mobile-menu{display:none!important}
+  .mobile-menu.show{display:flex!important}
+  .mobile-menu.show{position:absolute;left:16px;right:16px;top:64px;flex-direction:column;align-items:stretch;padding:10px;background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow)}
+  .mobile-menu.show li{margin:0!important}
+  .mobile-menu.show a{width:100%;padding:12px 14px!important}
+  .hero-title{font-size:40px!important}
+  .page-title{font-size:34px!important}
+  .detail-grid{grid-template-columns:1fr!important}
+  .feature-grid,.product-grid{grid-template-columns:1fr!important}
+  .filter-grid{grid-template-columns:1fr!important}
+  .footer-grid{grid-template-columns:1fr!important}
+  .footer-bottom{flex-direction:column!important;text-align:center}
+  .hero-buttons{flex-direction:column!important;align-items:stretch!important}
+  .hero-buttons a{text-align:center}
+}
+@media(max-width:430px){
+  .hero-title{font-size:33px!important}
+  .detail-title{font-size:29px!important}
 }
 
-body{
-    font-family: "Poppins", sans-serif;
-    background:#f5f7fa;
-    color:#333;
-}
-
-/* ===========================
-   NAVBAR
-=========================== */
-
-.navbar{
-    box-shadow:0 4px 10px rgba(0,0,0,.15);
-}
-
-.navbar-brand{
-    font-size:1.5rem;
-    font-weight:700;
-}
-
-.nav-link{
-    transition:.3s;
-}
-
-.nav-link:hover{
-    color:#ffc107 !important;
-}
-
-/* ===========================
-   HERO
-=========================== */
-
-.hero{
-
-    background:linear-gradient(135deg,#198754,#20c997);
-
-    color:white;
-
-    padding:100px 0;
-
-    border-radius:0 0 30px 30px;
-
-    margin-bottom:40px;
-}
-
-.hero h1{
-
-    font-size:3rem;
-
-    font-weight:700;
-
-}
-
-.hero p{
-
-    font-size:1.2rem;
-
-    margin:20px 0;
-
-}
-
-.hero .btn{
-
-    padding:12px 35px;
-
-    border-radius:50px;
-
-    font-size:18px;
-
-}
-
-/* ===========================
-   CARD
-=========================== */
-
-.card{
-
-    border:none;
-
-    border-radius:20px;
-
-    overflow:hidden;
-
-    transition:.35s;
-
-}
-
-.card:hover{
-
-    transform:translateY(-10px);
-
-    box-shadow:0 15px 35px rgba(0,0,0,.2);
-
-}
-
-.card img{
-
-    height:240px;
-
-    object-fit:cover;
-
-}
-
-.card-body{
-
-    padding:25px;
-
-}
-
-.card-title{
-
-    font-weight:700;
-
-}
-
-.card p{
-
-    margin-bottom:8px;
-
-}
-
-.card .btn{
-
-    border-radius:30px;
-
-}
-
-/* ===========================
-   DETAIL
-=========================== */
-
-.detail-img{
-
-    border-radius:20px;
-
-    box-shadow:0 8px 20px rgba(0,0,0,.2);
-
-}
-
-.detail-price{
-
-    font-size:30px;
-
-    font-weight:bold;
-
-    color:#198754;
-
-}
-
-/* ===========================
-   FORM FILTER
-=========================== */
-
-form{
-
-    margin-bottom:40px;
-
-}
-
-.form-control,
-
-.form-select{
-
-    height:50px;
-
-    border-radius:12px;
-
-}
-
-.btn-success{
-
-    height:50px;
-
-    border-radius:12px;
-
-}
-
-/* ===========================
-   FOOTER
-=========================== */
-
-footer{
-
-    margin-top:80px;
-
-    background:#198754;
-
-    color:white;
-
-}
-
-footer p{
-
-    margin:0;
-
-    padding:20px;
-
-}
-
-/* ===========================
-   ANIMATION
-=========================== */
-
-.fade-up{
-
-    animation:fadeUp .8s ease;
-}
-
-@keyframes fadeUp{
-
-    from{
-
-        opacity:0;
-
-        transform:translateY(30px);
-
-    }
-
-    to{
-
-        opacity:1;
-
-        transform:translateY(0);
-
-    }
-
-}
-
-/* ===========================
-   RESPONSIVE
-=========================== */
-
-@media(max-width:768px){
-
-.hero{
-
-padding:70px 20px;
-
-}
-
-.hero h1{
-
-font-size:2rem;
-
-}
-
-.card img{
-
-height:200px;
-
-}
-
-}
+/* Handmade interface icons — SVG only, no emoji */
+.icon{width:1em;height:1em;display:inline-block;vertical-align:-.16em;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:0 0 auto}
+.icon-basket,.icon-bag,.icon-chat,.icon-money,.icon-grain,.icon-leaf,.icon-truck,.icon-spark,.icon-check{width:1.15em;height:1.15em}
+.icon-check{stroke-width:2.2}
+.brand-mark .icon{width:22px;height:22px}
+.feature-icon{width:30px;height:30px;display:flex;align-items:center;justify-content:center;color:var(--green);background:var(--green-soft);border-radius:9px}
+.feature-icon .icon{width:18px;height:18px}
+.product-symbol{width:74px;height:74px;display:flex;align-items:center;justify-content:center;border:1px solid #dcebe1;background:#fff;border-radius:20px;color:var(--green);box-shadow:0 14px 28px rgba(31,70,48,.08)}
+.product-symbol .icon{width:34px;height:34px}
+.ai-mark{width:34px;height:34px;display:flex;align-items:center;justify-content:center;background:var(--green-soft);color:var(--green);border-radius:10px}
+.ai-mark .icon{width:19px;height:19px}
+
+.menu-icon{width:20px;height:20px;display:block;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round}
+
+.icon-search{width:16px;height:16px}
