@@ -3,6 +3,9 @@ const router = express.Router();
 
 const products = require("../data/products");
 
+// ======================
+// GET /api/products
+// ======================
 router.get("/products", (req, res) => {
 
     res.json({

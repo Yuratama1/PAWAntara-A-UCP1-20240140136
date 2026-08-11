@@ -1,6 +1,8 @@
 const express = require("express");
 const path = require("path");
 
+const logger = require("./middleware/logger");
+
 const app = express();
 const PORT = 3000;
 
@@ -9,6 +11,7 @@ app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 
 // Middleware
+app.use(logger);
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
@@ -24,10 +27,13 @@ app.use("/api", apiRoutes);
 
 // 404
 app.use((req, res) => {
-    res.status(404).render("notfound");
+    res.status(404).render("notfound", {
+        title: "Halaman Tidak Ditemukan",
+        currentPage: ""
+    });
 });
 
 // Running Server
 app.listen(PORT, () => {
-    console.log(`🚀 Server berjalan di http://localhost:${PORT}`);
+    console.log(`SERVER Server berjalan di http://localhost:${PORT}`);
 });
