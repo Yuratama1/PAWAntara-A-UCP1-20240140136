@@ -1,78 +1,33 @@
-<!DOCTYPE html>
-<html lang="id">
-
-<head>
-
-<meta charset="UTF-8">
-
-<title>Detail Produk</title>
-
-</head>
-
-<body>
-
 <%- include("partials/navbar") %>
 
-<main class="container py-5">
+<main class="page-shell">
+  <section style="padding:58px 0 75px;background:#fffaf0;">
+    <div class="container-global">
+      <div class="detail-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:34px;align-items:center;">
+        <div style="min-height:390px;display:flex;align-items:center;justify-content:center;background:linear-gradient(145deg,#eaf7ef,#fffaf0);border:1px solid #dcebe1;border-radius:24px;overflow:hidden;">
+          <div style="text-align:center;padding:30px;">
+            <div style="width:120px;height:120px;margin:0 auto;display:flex;align-items:center;justify-content:center;background:#fff;border:1px solid #dcebe1;border-radius:32px;font-size:58px;box-shadow:0 20px 40px rgba(31,41,55,.08);"><svg class="icon icon-basket" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h16l-1.2 10H5.2L4 9Z"/><path d="M8 9a4 4 0 0 1 8 0"/><path d="M8 13h.01M12 13h.01M16 13h.01"/></svg></div>
+            <span style="display:block;margin-top:18px;color:#1f7a4d;font-size:11px;font-weight:850;letter-spacing:1.2px;text-transform:uppercase;">Produk Toko Ariesta</span>
+            <p style="margin-top:6px;color:#7a847e;font-size:12px;">Informasi produk tanpa foto, fokus pada harga dan stok.</p>
+          </div>
+        </div>
 
-<div class="row">
+        <article style="padding:34px;background:#fff;border:1px solid #e7e5df;border-radius:22px;box-shadow:0 12px 35px rgba(31,41,55,.06);">
+          <span style="display:inline-block;padding:7px 12px;background:#eaf7ef;color:#1f7a4d;border-radius:999px;font-size:11px;font-weight:850;"><%= product.category %></span>
+          <h1 class="detail-title" style="margin:18px 0 12px;color:#173326;font-size:37px;line-height:1.2;letter-spacing:-.7px;"><%= product.name %></h1>
+          <p style="color:#1f7a4d;font-size:30px;font-weight:850;">Rp <%= product.price.toLocaleString("id-ID") %></p>
 
-<div class="col-md-5">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin:25px 0;padding:15px 17px;background:#f7fbf8;border:1px solid #e4eee7;border-radius:13px;">
+            <span style="color:#66736b;font-size:13px;font-weight:700;">Stok tersedia</span>
+            <strong style="color:#1f7a4d;font-size:17px;"><%= product.stock %></strong>
+          </div>
 
-<img
-src="<%= product.image %>"
-class="img-fluid rounded shadow">
-
-</div>
-
-<div class="col-md-7">
-
-<h2>
-
-<%= product.name %>
-
-</h2>
-
-<hr>
-
-<p>
-
-<strong>Kategori :</strong>
-
-<%= product.category %>
-
-</p>
-
-<p>
-
-<strong>Harga :</strong>
-
-Rp <%= product.price.toLocaleString("id-ID") %>
-
-</p>
-
-<p>
-
-<strong>Stok :</strong>
-
-<%= product.stock %>
-
-</p>
-
-<a href="/produk" class="btn btn-secondary">
-
-Kembali
-
-</a>
-
-</div>
-
-</div>
-
+          <div style="padding:14px 16px;background:#fffaf0;border-radius:13px;color:#766f60;font-size:12px;line-height:1.7;">Informasi harga dan stok dapat dikelola oleh admin toko melalui sistem.</div>
+          <a href="/produk" class="secondary-btn" style="display:inline-block;margin-top:22px;padding:11px 18px;background:#fff;color:#1f7a4d;border:1px solid #d8e2da;border-radius:10px;font-size:12px;font-weight:800;">← Kembali ke Produk</a>
+        </article>
+      </div>
+    </div>
+  </section>
 </main>
 
 <%- include("partials/footer") %>
-
-</body>
-
-</html>

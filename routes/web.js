@@ -7,10 +7,13 @@ const products = require("../data/products");
 // BERANDA
 // =====================
 router.get("/", (req, res) => {
+
     res.render("home", {
         title: "Beranda",
+        currentPage: "home",
         products: products.slice(0, 3)
     });
+
 });
 
 // =====================
@@ -22,20 +25,27 @@ router.get("/produk", (req, res) => {
 
     const { kategori, search } = req.query;
 
+    // Filter berdasarkan kategori
     if (kategori) {
+
         filteredProducts = filteredProducts.filter(product =>
             product.category.toLowerCase() === kategori.toLowerCase()
         );
+
     }
 
+    // Filter berdasarkan nama produk
     if (search) {
+
         filteredProducts = filteredProducts.filter(product =>
             product.name.toLowerCase().includes(search.toLowerCase())
         );
+
     }
 
     res.render("products", {
         title: "Daftar Produk",
+        currentPage: "produk",
         products: filteredProducts,
         kategori,
         search
@@ -53,11 +63,17 @@ router.get("/produk/:id", (req, res) => {
     const product = products.find(item => item.id === id);
 
     if (!product) {
-        return res.status(404).render("notfound");
+
+        return res.status(404).render("notfound", {
+            title: "Produk Tidak Ditemukan",
+            currentPage: "produk"
+        });
+
     }
 
     res.render("detail", {
-        title: "Detail Produk",
+        title: product.name,
+        currentPage: "produk",
         product
     });
 
@@ -69,7 +85,8 @@ router.get("/produk/:id", (req, res) => {
 router.get("/tanya-ai", (req, res) => {
 
     res.render("ai", {
-        title: "Tanya AI"
+        title: "Tanya AI",
+        currentPage: "ai"
     });
 
 });

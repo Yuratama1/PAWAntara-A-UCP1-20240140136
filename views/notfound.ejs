@@ -1,42 +1,16 @@
-<!DOCTYPE html>
-<html lang="id">
-
-<head>
-
-<meta charset="UTF-8">
-
-<title>Produk Tidak Ditemukan</title>
-
-</head>
-
-<body>
-
 <%- include("partials/navbar") %>
 
-<main class="container text-center py-5">
-
-<h1 class="display-3">
-
-404
-
-</h1>
-
-<p class="lead">
-
-Halaman atau produk tidak ditemukan.
-
-</p>
-
-<a href="/" class="btn btn-success">
-
-Kembali ke Beranda
-
-</a>
-
+<main class="page-shell">
+  <section style="min-height:62vh;padding:75px 20px;display:flex;align-items:center;justify-content:center;text-align:center;background:#fffaf0;">
+    <div class="container-global">
+      <div style="max-width:610px;margin:0 auto;padding:48px 30px;background:#fff;border:1px solid #e7e5df;border-radius:22px;box-shadow:0 12px 35px rgba(31,41,55,.06);">
+        <div style="display:inline-flex;width:82px;height:82px;align-items:center;justify-content:center;background:#eaf7ef;color:#1f7a4d;border-radius:50%;font-size:28px;font-weight:850;">404</div>
+        <h1 style="margin:18px 0 10px;color:#173326;font-size:30px;">Produk Tidak Ditemukan</h1>
+        <p style="margin:0 auto 24px;max-width:430px;color:#737d76;font-size:13px;line-height:1.8;">Maaf, produk atau halaman yang kamu cari tidak tersedia. Silakan kembali ke katalog.</p>
+        <a href="/" class="primary-btn" style="display:inline-block;padding:12px 20px;background:#1f7a4d;color:#fff;border-radius:11px;font-size:12px;font-weight:800;">← Kembali ke Beranda</a>
+      </div>
+    </div>
+  </section>
 </main>
 
 <%- include("partials/footer") %>
-
-</body>
-
-</html>

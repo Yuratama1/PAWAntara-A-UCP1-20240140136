@@ -1,64 +1,77 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <title>Produk</title>
-</head>
-
-<body>
-
 <%- include("partials/navbar") %>
 
-<main>
+<main class="page-shell">
+  <section style="padding:58px 0 28px;background:#fffaf0;">
+    <div class="container-global" style="text-align:center;">
+      <span style="display:inline-block;color:#1f7a4d;font-size:11px;font-weight:850;letter-spacing:1.5px;text-transform:uppercase;">KATALOG SEMBAKO</span>
+      <h1 class="page-title" style="margin-top:8px;color:#173326;font-size:43px;line-height:1.15;letter-spacing:-1px;">Kebutuhan harian, <span style="color:#1f7a4d;">lebih mudah dicari.</span></h1>
+      <p style="max-width:620px;margin:12px auto 0;color:#718078;font-size:14px;">Cari produk berdasarkan nama atau kategori untuk menemukan kebutuhan rumah tangga dengan cepat.</p>
+    </div>
+  </section>
 
-<h1>Daftar Produk</h1>
+  <section style="padding:14px 0 30px;background:#fffaf0;">
+    <div class="container-global">
+      <div style="padding:20px;background:#fff;border:1px solid #e7e5df;border-radius:18px;box-shadow:0 8px 25px rgba(31,41,55,.05);">
+        <form action="/produk" method="GET">
+          <div class="filter-grid" style="display:grid;grid-template-columns:1.4fr 1fr auto;gap:10px;">
+            <div>
+              <label for="search" style="display:block;margin-bottom:7px;color:#374151;font-size:11px;font-weight:800;">Cari Produk</label>
+              <input class="input-ui" id="search" type="text" name="search" value="<%= search || '' %>" placeholder="Contoh: Beras, Minyak, Gula..." style="width:100%;height:48px;padding:0 14px;background:#fcfcfa;border:1px solid #deddd6;border-radius:11px;color:#1f2937;font-size:13px;">
+            </div>
+            <div>
+              <label for="kategori" style="display:block;margin-bottom:7px;color:#374151;font-size:11px;font-weight:800;">Kategori</label>
+              <select class="input-ui" id="kategori" name="kategori" style="width:100%;height:48px;padding:0 14px;background:#fcfcfa;border:1px solid #deddd6;border-radius:11px;color:#1f2937;font-size:13px;">
+                <option value="">Semua Kategori</option>
+                <% ["Beras","Minyak Goreng","Gula","Tepung","Mie Instan","Telur","Minuman","Bumbu Dapur","Kebutuhan Rumah"].forEach(cat => { %>
+                  <option value="<%= cat %>" <%= kategori === cat ? "selected" : "" %>><%= cat %></option>
+                <% }) %>
+              </select>
+            </div>
+            <div style="display:flex;align-items:flex-end;">
+              <button type="submit" class="primary-btn" style="width:100%;height:48px;padding:0 20px;background:#1f7a4d;color:#fff;border:none;border-radius:11px;font-size:13px;font-weight:800;">Cari Produk</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </section>
 
-<table border="1">
+  <section style="padding:22px 0 70px;background:#fffaf0;">
+    <div class="container-global">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:15px;margin-bottom:24px;">
+        <div><h2 style="color:#173326;font-size:22px;">Produk Sembako</h2><p style="margin-top:3px;color:#929a95;font-size:12px;">Temukan kebutuhan yang kamu cari.</p></div>
+        <div style="padding:7px 11px;background:#eaf7ef;color:#1f7a4d;border-radius:999px;font-size:11px;font-weight:850;"><%= products.length %> Produk</div>
+      </div>
 
-<tr>
+      <% if (products.length === 0) { %>
+        <div style="padding:65px 25px;background:#fff;border:1px solid #e7e5df;border-radius:18px;text-align:center;">
+          <div style="width:70px;height:70px;margin:0 auto 18px;display:flex;align-items:center;justify-content:center;background:#eaf7ef;border-radius:50%;font-size:30px;"><svg class="icon icon-search" viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 4 4"/></svg></div>
+          <h3 style="color:#173326;font-size:20px;">Produk tidak ditemukan</h3>
+          <p style="max-width:420px;margin:8px auto 20px;color:#727b75;font-size:13px;">Coba gunakan kata kunci lain atau pilih kategori yang berbeda.</p>
+          <a href="/produk" class="primary-btn" style="display:inline-block;padding:10px 18px;background:#1f7a4d;color:#fff;border-radius:10px;font-size:12px;font-weight:800;">Lihat Semua Produk</a>
+        </div>
+      <% } %>
 
-<th>ID</th>
-<th>Nama</th>
-<th>Kategori</th>
-<th>Harga</th>
-<th>Stok</th>
-<th>Aksi</th>
-
-</tr>
-
-<% products.forEach(product => { %>
-
-<tr>
-
-<td><%= product.id %></td>
-
-<td><%= product.name %></td>
-
-<td><%= product.category %></td>
-
-<td>Rp <%= product.price %></td>
-
-<td><%= product.stock %></td>
-
-<td>
-
-<a href="/produk/<%= product.id %>">
-
-Detail
-
-</a>
-
-</td>
-
-</tr>
-
-<% }) %>
-
-</table>
-
+      <% if (products.length > 0) { %>
+        <div class="product-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px;">
+          <% products.forEach(product => { %>
+            <article class="product-card" style="background:#fff;border:1px solid #e7e5df;border-radius:18px;overflow:hidden;">
+              <div style="height:205px;display:flex;align-items:center;justify-content:center;background:linear-gradient(145deg,#f5faf6,#fffaf0);overflow:hidden;">
+                <div style="width:98px;height:98px;display:flex;align-items:center;justify-content:center;background:#fff;border:1px solid #e0ebe3;border-radius:25px;font-size:46px;box-shadow:0 14px 28px rgba(31,70,48,.08);"><svg class="icon icon-basket" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h16l-1.2 10H5.2L4 9Z"/><path d="M8 9a4 4 0 0 1 8 0"/><path d="M8 13h.01M12 13h.01M16 13h.01"/></svg></div>
+              </div>
+              <div style="padding:20px;">
+                <span style="color:#1f7a4d;font-size:10px;font-weight:850;letter-spacing:.8px;text-transform:uppercase;"><%= product.category %></span>
+                <h3 style="min-height:48px;margin:8px 0 0;color:#26352d;font-size:17px;line-height:1.4;"><%= product.name %></h3>
+                <div class="product-price" style="margin-top:14px;color:#1f7a4d;font-size:23px;font-weight:850;">Rp <%= product.price.toLocaleString("id-ID") %></div>
+                <div style="margin-top:6px;color:#929a95;font-size:11px;"><span style="display:inline-block;width:7px;height:7px;margin-right:4px;background:#22c55e;border-radius:50%;"></span>Stok tersedia: <strong style="color:#5c6961;"><%= product.stock %></strong></div>
+                <a href="/produk/<%= product.id %>" class="primary-btn" style="display:block;margin-top:18px;padding:11px;background:#1f7a4d;color:#fff;border-radius:10px;text-align:center;font-size:12px;font-weight:800;">Lihat Detail Produk →</a>
+              </div>
+            </article>
+          <% }) %>
+        </div>
+      <% } %>
+    </div>
+  </section>
 </main>
 
 <%- include("partials/footer") %>
-
-</body>
-</html>
