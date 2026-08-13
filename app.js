@@ -1,10 +1,12 @@
 const express = require("express");
 const path = require("path");
-
+const { connectToDatabase } = require("./config/db");
 const logger = require("./middleware/logger");
 
 const app = express();
 const PORT = 3000;
+
+connectToDatabase();
 
 // View Engine
 app.set("view engine", "ejs");
@@ -35,5 +37,7 @@ app.use((req, res) => {
 
 // Running Server
 app.listen(PORT, () => {
-    console.log(`SERVER Server berjalan di http://localhost:${PORT}`);
+    console.log(
+        `SERVER Server berjalan di http://localhost:${PORT}`
+    );
 });
