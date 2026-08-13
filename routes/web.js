@@ -55,34 +55,9 @@ router.get("/", (req, res) => {
 // =====================
 router.get("/produk", (req, res) => {
 
-    let filteredProducts = [...products];
-
-    const { kategori, search } = req.query;
-
-    // Filter berdasarkan kategori
-    if (kategori) {
-
-        filteredProducts = filteredProducts.filter(product =>
-            product.category.toLowerCase() === kategori.toLowerCase()
-        );
-
-    }
-
-    // Filter berdasarkan nama produk
-    if (search) {
-
-        filteredProducts = filteredProducts.filter(product =>
-            product.name.toLowerCase().includes(search.toLowerCase())
-        );
-
-    }
-
     res.render("products", {
         title: "Daftar Produk",
-        currentPage: "produk",
-        products: filteredProducts,
-        kategori,
-        search
+        currentPage: "produk"
     });
 
 });
