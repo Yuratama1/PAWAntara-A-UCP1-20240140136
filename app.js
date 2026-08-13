@@ -1,5 +1,7 @@
 const express = require("express");
 const path = require("path");
+const session = require("express-session");
+
 const { connectToDatabase } = require("./config/db");
 const logger = require("./middleware/logger");
 
@@ -14,8 +16,22 @@ app.set("views", path.join(__dirname, "views"));
 
 // Middleware
 app.use(logger);
-app.use(express.urlencoded({ extended: true }));
+
+app.use(express.urlencoded({
+    extended: true
+}));
+
 app.use(express.json());
+
+app.use(session({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+        httpOnly: true,
+        maxAge: 1000 * 60 * 60
+    }
+}));
 
 // Static Folder
 app.use(express.static(path.join(__dirname, "public")));

@@ -1,7 +1,41 @@
 const express = require("express");
 const router = express.Router();
 
+const requireAuth = require("../middleware/auth");
+
 const products = require("../data/products");
+
+// =====================
+// LOGIN
+// =====================
+router.get("/login", (req, res) => {
+
+    if (req.session && req.session.admin) {
+        return res.redirect("/dashboard");
+    }
+
+    res.render("login", {
+        title: "Login",
+        currentPage: "login"
+    });
+});
+
+// =====================
+// DASHBOARD
+// =====================
+router.get(
+    "/dashboard",
+    requireAuth,
+    (req, res) => {
+
+        res.render("dashboard", {
+            title: "Dashboard",
+            currentPage: "dashboard",
+            admin: req.session.admin
+        });
+
+    }
+);
 
 // =====================
 // BERANDA
