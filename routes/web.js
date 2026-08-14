@@ -2,11 +2,15 @@ const express = require("express");
 
 const router = express.Router();
 
+const {
+    sequelize
+} = require("../config/db");
+
+const Product =
+    require("../models/products")(sequelize);
+
 const requireAuth =
     require("../middleware/auth");
-
-const products =
-    require("../data/products");
 
 
 // ======================================================
@@ -17,7 +21,8 @@ router.get(
     "/login",
     (req, res) => {
 
-        // Jika sudah login
+        // Jika admin sudah login,
+        // langsung arahkan ke dashboard
         if (
             req.session &&
             req.session.admin
@@ -28,7 +33,6 @@ router.get(
             );
 
         }
-
 
         return res.render(
             "login",
@@ -73,17 +77,38 @@ router.get(
 
 router.get(
     "/",
-    (req, res) => {
+    async (req, res, next) => {
 
-        return res.render(
-            "home",
-            {
-                title: "Beranda",
-                currentPage: "home",
-                products:
-                    products.slice(0, 3)
-            }
-        );
+        try {
+
+            // Ambil 3 produk terbaru berdasarkan ID
+            const products =
+                await Product.findAll({
+                    order: [
+                        ["id", "ASC"]
+                    ],
+                    limit: 3
+                });
+
+            return res.render(
+                "home",
+                {
+                    title: "Beranda",
+                    currentPage: "home",
+                    products
+                }
+            );
+
+        } catch (error) {
+
+            console.error(
+                "Home products error:",
+                error
+            );
+
+            next(error);
+
+        }
 
     }
 );
@@ -92,6 +117,10 @@ router.get(
 // ======================================================
 // HALAMAN PRODUK
 // PUBLIC
+//
+// Sprint 2:
+// Data produk ditampilkan melalui Fetch API
+// dari GET /api/products
 // ======================================================
 
 router.get(
@@ -120,50 +149,94 @@ router.get(
 
 router.get(
     "/produk/:id",
-    (req, res) => {
+    async (req, res, next) => {
 
-        const id =
-            parseInt(
-                req.params.id,
-                10
-            );
+        try {
 
-
-        const product =
-            products.find(
-                item =>
-                    item.id === id
-            );
+            const id =
+                parseInt(
+                    req.params.id,
+                    10
+                );
 
 
-        if (!product) {
+            // ======================
+            // VALIDASI ID
+            // ======================
 
-            return res.status(404).render(
-                "notfound",
+            if (
+                Number.isNaN(id)
+            ) {
+
+                return res.status(404).render(
+                    "notfound",
+                    {
+                        title:
+                            "Produk Tidak Ditemukan",
+
+                        currentPage:
+                            "produk"
+                    }
+                );
+
+            }
+
+
+            // ======================
+            // CARI PRODUK DI DATABASE
+            // ======================
+
+            const product =
+                await Product.findByPk(id);
+
+
+            // ======================
+            // PRODUK TIDAK DITEMUKAN
+            // ======================
+
+            if (!product) {
+
+                return res.status(404).render(
+                    "notfound",
+                    {
+                        title:
+                            "Produk Tidak Ditemukan",
+
+                        currentPage:
+                            "produk"
+                    }
+                );
+
+            }
+
+
+            // ======================
+            // TAMPILKAN DETAIL
+            // ======================
+
+            return res.render(
+                "detail",
                 {
                     title:
-                        "Produk Tidak Ditemukan",
+                        product.name,
 
                     currentPage:
-                        "produk"
+                        "produk",
+
+                    product
                 }
             );
 
+        } catch (error) {
+
+            console.error(
+                "Product detail error:",
+                error
+            );
+
+            next(error);
+
         }
-
-
-        return res.render(
-            "detail",
-            {
-                title:
-                    product.name,
-
-                currentPage:
-                    "produk",
-
-                product
-            }
-        );
 
     }
 );
