@@ -1,6 +1,7 @@
 const express = require("express");
 const path = require("path");
 const session = require("express-session");
+const rateLimit = require("express-rate-limit");
 
 const {
     connectToDatabase
@@ -8,7 +9,6 @@ const {
 
 const logger =
     require("./middleware/logger");
-
 
 const app = express();
 
@@ -63,7 +63,6 @@ app.use(
 // SESSION
 // ======================================================
 
-// Pastikan SESSION_SECRET tersedia
 if (!process.env.SESSION_SECRET) {
 
     throw new Error(
@@ -71,7 +70,6 @@ if (!process.env.SESSION_SECRET) {
     );
 
 }
-
 
 app.use(
     session({
@@ -91,7 +89,8 @@ app.use(
 
             // false untuk localhost / HTTP
             // true jika production menggunakan HTTPS
-            secure: false,
+            secure:
+                process.env.NODE_ENV === "production",
 
             // 1 jam
             maxAge:
@@ -118,6 +117,37 @@ app.use(
 
 
 // ======================================================
+// LOGIN RATE LIMITER
+// ======================================================
+
+const loginLimiter =
+    rateLimit({
+
+        // Batas waktu 15 menit
+        windowMs:
+            15 * 60 * 1000,
+
+        // Maksimal 5 request login
+        max: 5,
+
+        // Kirim informasi rate limit
+        // melalui header standar
+        standardHeaders: true,
+
+        // Tidak menggunakan header lama
+        legacyHeaders: false,
+
+        // Response ketika limit tercapai
+        message: {
+            status: "error",
+            message:
+                "Terlalu banyak percobaan login. Silakan coba lagi dalam 15 menit."
+        }
+
+    });
+
+
+// ======================================================
 // ROUTES
 // ======================================================
 
@@ -126,6 +156,13 @@ const webRoutes =
 
 const apiRoutes =
     require("./routes/api");
+
+
+// Rate limit khusus endpoint login
+app.use(
+    "/api/login",
+    loginLimiter
+);
 
 
 app.use(
@@ -187,7 +224,6 @@ app.use(
 
         }
 
-
         next(error);
 
     }
@@ -200,7 +236,6 @@ app.use(
 
 app.use(
     (req, res) => {
-
 
         // ======================
         // API
