@@ -1,304 +1,663 @@
-<%- include("partials/navbar") %>
+<%
+    const currentSearch =
+        typeof search === "string"
+            ? search
+            : "";
 
-<main class="page-shell">
+    const currentKategori =
+        typeof kategori === "string"
+            ? kategori
+            : "";
 
-  <!-- =========================
-       HERO
-  ========================== -->
-  <section style="padding:58px 0 28px;background:#fffaf0;">
-    <div class="container-global" style="text-align:center;">
+    const categoryList =
+        Array.isArray(categories)
+            ? categories
+            : [];
+%>
 
-      <span
-        style="
-          display:inline-block;
-          color:#1f7a4d;
-          font-size:11px;
-          font-weight:850;
-          letter-spacing:1.5px;
-          text-transform:uppercase;
-        "
-      >
-        KATALOG SEMBAKO
-      </span>
+<!DOCTYPE html>
+<html lang="id">
 
-      <h1
-        class="page-title"
-        style="
-          margin-top:8px;
-          color:#173326;
-          font-size:43px;
-          line-height:1.15;
-          letter-spacing:-1px;
-        "
-      >
-        Kebutuhan harian,
-        <span style="color:#1f7a4d;">
-          lebih mudah dicari.
-        </span>
-      </h1>
+<head>
 
-      <p
-        style="
-          max-width:620px;
-          margin:12px auto 0;
-          color:#718078;
-          font-size:14px;
-        "
-      >
-        Cari produk berdasarkan nama atau kategori
-        untuk menemukan kebutuhan rumah tangga dengan cepat.
-      </p>
+    <meta charset="UTF-8">
 
-    </div>
-  </section>
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
+    <title>
+        <%= title %> - Toko Ariesta
+    </title>
 
-  <!-- =========================
-       FILTER
-  ========================== -->
-  <section style="padding:14px 0 30px;background:#fffaf0;">
+    <link
+        rel="stylesheet"
+        href="/css/style.css"
+    >
 
-    <div class="container-global">
+    <style>
 
-      <div
-        style="
-          padding:20px;
-          background:#fff;
-          border:1px solid #e7e5df;
-          border-radius:18px;
-          box-shadow:0 8px 25px rgba(31,41,55,.05);
-        "
-      >
+        .products-page {
+            width: 100%;
+            min-height: 100vh;
+            padding: 40px 20px 60px;
+            box-sizing: border-box;
+        }
 
-        <form id="filterForm">
+        .products-container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
 
-          <div
-            class="filter-grid"
-            style="
-              display:grid;
-              grid-template-columns:1.4fr 1fr auto;
-              gap:10px;
-            "
-          >
+        .products-header {
+            margin-bottom: 30px;
+        }
 
-            <!-- SEARCH -->
-            <div>
+        .products-header h1 {
+            margin: 0 0 8px;
+            font-size: 32px;
+            color: #1f2937;
+        }
 
-              <label
-                for="search"
-                style="
-                  display:block;
-                  margin-bottom:7px;
-                  color:#374151;
-                  font-size:11px;
-                  font-weight:800;
-                "
-              >
-                Cari Produk
-              </label>
+        .products-header p {
+            margin: 0;
+            color: #6b7280;
+            font-size: 15px;
+        }
 
-              <input
-                class="input-ui"
-                id="search"
-                type="text"
-                name="search"
-                placeholder="Contoh: Beras, Minyak, Gula..."
-                autocomplete="off"
-                style="
-                  width:100%;
-                  height:48px;
-                  padding:0 14px;
-                  background:#fcfcfa;
-                  border:1px solid #deddd6;
-                  border-radius:11px;
-                  color:#1f2937;
-                  font-size:13px;
-                  box-sizing:border-box;
-                "
-              >
+        /* ==========================
+           FILTER
+        ========================== */
 
-            </div>
+        .filter-card {
+            width: 100%;
+            padding: 22px;
+            margin-bottom: 30px;
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 16px;
+            box-sizing: border-box;
+            box-shadow:
+                0 5px 20px rgba(0, 0, 0, 0.05);
+        }
 
+        .filter-form {
+            display: grid;
+            grid-template-columns:
+                minmax(0, 2fr)
+                minmax(180px, 1fr)
+                auto;
+            gap: 14px;
+            align-items: end;
+        }
 
-            <!-- CATEGORY -->
-            <div>
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+        }
 
-              <label
-                for="kategori"
-                style="
-                  display:block;
-                  margin-bottom:7px;
-                  color:#374151;
-                  font-size:11px;
-                  font-weight:800;
-                "
-              >
-                Kategori
-              </label>
+        .filter-group label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #374151;
+        }
 
-              <select
-                class="input-ui"
-                id="kategori"
-                name="kategori"
-                style="
-                  width:100%;
-                  height:48px;
-                  padding:0 14px;
-                  background:#fcfcfa;
-                  border:1px solid #deddd6;
-                  border-radius:11px;
-                  color:#1f2937;
-                  font-size:13px;
-                  box-sizing:border-box;
-                "
-              >
+        .filter-input,
+        .filter-select {
+            width: 100%;
+            height: 46px;
+            padding: 0 14px;
+            background: #fcfcfa;
+            border: 1px solid #d1d5db;
+            border-radius: 10px;
+            color: #1f2937;
+            font-size: 14px;
+            box-sizing: border-box;
+            outline: none;
+            transition:
+                border-color 0.2s ease,
+                box-shadow 0.2s ease;
+        }
 
-                <option value="">
-                  Semua Kategori
-                </option>
+        .filter-input:focus,
+        .filter-select:focus {
+            border-color: #198754;
+            box-shadow:
+                0 0 0 3px rgba(
+                    25,
+                    135,
+                    84,
+                    0.12
+                );
+        }
 
-              </select>
+        .filter-actions {
+            display: flex;
+            gap: 8px;
+        }
 
-            </div>
+        .btn-filter,
+        .btn-reset {
+            height: 46px;
+            padding: 0 18px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            transition:
+                transform 0.2s ease,
+                opacity 0.2s ease;
+        }
 
+        .btn-filter {
+            background: #198754;
+            color: #ffffff;
+        }
 
-            <!-- BUTTON -->
-            <div style="display:flex;align-items:flex-end;">
+        .btn-reset {
+            background: #e9ecef;
+            color: #374151;
+        }
 
-              <button
-                type="submit"
-                class="primary-btn"
-                style="
-                  width:100%;
-                  height:48px;
-                  padding:0 20px;
-                  background:#1f7a4d;
-                  color:#fff;
-                  border:none;
-                  border-radius:11px;
-                  font-size:13px;
-                  font-weight:800;
-                  cursor:pointer;
-                "
-              >
-                Cari Produk
-              </button>
+        .btn-filter:hover,
+        .btn-reset:hover {
+            transform: translateY(-1px);
+        }
 
-            </div>
+        .btn-filter:active,
+        .btn-reset:active {
+            transform: translateY(0);
+        }
 
-          </div>
+        /* ==========================
+           PRODUCT HEADER
+        ========================== */
 
-        </form>
+        .product-list-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+            margin-bottom: 18px;
+        }
 
-      </div>
+        .product-list-header h2 {
+            margin: 0;
+            color: #1f2937;
+            font-size: 20px;
+        }
 
-    </div>
+        #product-count {
+            color: #6b7280;
+            font-size: 13px;
+        }
 
-  </section>
+        /* ==========================
+           PRODUCT GRID
+        ========================== */
 
+        .products-grid {
+            display: grid;
+            grid-template-columns:
+                repeat(3, minmax(0, 1fr));
+            gap: 20px;
+        }
 
-  <!-- =========================
-       PRODUCT SECTION
-  ========================== -->
-  <section style="padding:22px 0 70px;background:#fffaf0;">
+        .product-card {
+            position: relative;
+            padding: 22px;
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 16px;
+            box-sizing: border-box;
+            box-shadow:
+                0 5px 20px rgba(0, 0, 0, 0.05);
+            transition:
+                transform 0.2s ease,
+                box-shadow 0.2s ease;
+        }
 
-    <div class="container-global">
+        .product-card:hover {
+            transform: translateY(-3px);
+            box-shadow:
+                0 10px 25px rgba(
+                    0,
+                    0,
+                    0,
+                    0.08
+                );
+        }
 
-      <!-- HEADER -->
-      <div
-        style="
-          display:flex;
-          justify-content:space-between;
-          align-items:center;
-          gap:15px;
-          margin-bottom:24px;
-        "
-      >
+        .product-category {
+            display: inline-block;
+            margin-bottom: 12px;
+            padding: 5px 10px;
+            background: #eaf7f0;
+            border-radius: 20px;
+            color: #198754;
+            font-size: 11px;
+            font-weight: 600;
+        }
 
-        <div>
+        .product-name {
+            margin: 0 0 12px;
+            color: #1f2937;
+            font-size: 18px;
+            line-height: 1.4;
+        }
 
-          <h2
-            style="
-              margin:0;
-              color:#173326;
-              font-size:22px;
-            "
-          >
-            Produk Sembako
-          </h2>
+        .product-price {
+            margin-bottom: 10px;
+            color: #198754;
+            font-size: 18px;
+            font-weight: 700;
+        }
 
-          <p
-            style="
-              margin-top:3px;
-              color:#929a95;
-              font-size:12px;
-            "
-          >
-            Temukan kebutuhan yang kamu cari.
-          </p>
+        .product-stock {
+            margin-bottom: 18px;
+            color: #6b7280;
+            font-size: 13px;
+        }
 
-        </div>
+        .product-stock.available {
+            color: #198754;
+        }
 
+        .product-stock.empty {
+            color: #dc3545;
+        }
 
-        <!-- JUMLAH PRODUK -->
-        <div
-          id="productCount"
-          style="
-            padding:7px 11px;
-            background:#eaf7ef;
-            color:#1f7a4d;
-            border-radius:999px;
-            font-size:11px;
-            font-weight:850;
-          "
-        >
-          Memuat...
-        </div>
+        .product-detail-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            min-height: 42px;
+            padding: 0 15px;
+            background: #198754;
+            border-radius: 9px;
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+            box-sizing: border-box;
+            transition: opacity 0.2s ease;
+        }
 
-      </div>
+        .product-detail-link:hover {
+            opacity: 0.9;
+        }
 
-
-      <!-- =========================
+        /* ==========================
            MESSAGE
-      ========================== -->
+        ========================== */
 
-      <div
-        id="productMessage"
-        role="status"
-        aria-live="polite"
-        style="
-          display:none;
-          padding:14px 16px;
-          margin-bottom:20px;
-          border-radius:10px;
-          font-size:13px;
-        "
-      ></div>
+        #product-message {
+            margin-bottom: 20px;
+        }
+
+        .product-message {
+            padding: 14px 16px;
+            border-radius: 10px;
+            font-size: 13px;
+        }
+
+        .product-message.loading {
+            background: #f3f4f6;
+            color: #4b5563;
+        }
+
+        .product-message.error {
+            background: #fef2f2;
+            color: #b91c1c;
+        }
+
+        .product-message.empty {
+            background: #f9fafb;
+            color: #6b7280;
+            text-align: center;
+        }
+
+        /* ==========================
+           EMPTY STATE
+        ========================== */
+
+        .empty-state {
+            grid-column: 1 / -1;
+            padding: 50px 20px;
+            background: #ffffff;
+            border: 1px dashed #d1d5db;
+            border-radius: 16px;
+            text-align: center;
+        }
+
+        .empty-state h3 {
+            margin: 0 0 8px;
+            color: #374151;
+            font-size: 18px;
+        }
+
+        .empty-state p {
+            margin: 0;
+            color: #6b7280;
+            font-size: 13px;
+        }
+
+        /* ==========================
+           TABLET
+        ========================== */
+
+        @media (max-width: 900px) {
+
+            .products-grid {
+                grid-template-columns:
+                    repeat(2, minmax(0, 1fr));
+            }
+
+            .filter-form {
+                grid-template-columns:
+                    1fr 1fr;
+            }
+
+            .filter-actions {
+                grid-column: 1 / -1;
+            }
+
+            .btn-filter,
+            .btn-reset {
+                flex: 1;
+            }
+
+        }
+
+        /* ==========================
+           MOBILE
+        ========================== */
+
+        @media (max-width: 600px) {
+
+            .products-page {
+                padding:
+                    30px 15px 45px;
+            }
+
+            .products-header h1 {
+                font-size: 26px;
+            }
+
+            .filter-card {
+                padding: 16px;
+            }
+
+            .filter-form {
+                grid-template-columns: 1fr;
+            }
+
+            .filter-actions {
+                grid-column: auto;
+                flex-direction: column;
+            }
+
+            .products-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .product-list-header {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+        }
+
+    </style>
+
+</head>
 
 
-      <!-- =========================
-           PRODUCT CONTAINER
-      ========================== -->
-
-      <div
-        id="productContainer"
-        class="product-grid"
-        aria-live="polite"
-        style="
-          display:grid;
-          grid-template-columns:repeat(3,1fr);
-          gap:20px;
-        "
-      ></div>
-
-    </div>
-
-  </section>
-
-</main>
+<body>
 
 
-<%- include("partials/footer") %>
+    <!-- ==========================
+         NAVBAR
+    =========================== -->
+
+    <%- include("partials/navbar", {
+        currentPage: currentPage
+    }) %>
 
 
-<script src="/js/products.js"></script>
+    <!-- ==========================
+         MAIN
+    =========================== -->
+
+    <main
+        class="products-page"
+    >
+
+        <div
+            class="products-container"
+        >
+
+
+            <!-- ==========================
+                 HEADER
+            =========================== -->
+
+            <section
+                class="products-header"
+            >
+
+                <h1>
+                    Daftar Produk
+                </h1>
+
+                <p>
+                    Temukan berbagai kebutuhan
+                    sembako di Toko Ariesta.
+                </p>
+
+            </section>
+
+
+            <!-- ==========================
+                 FILTER
+            =========================== -->
+
+            <section
+                class="filter-card"
+                aria-label="Filter produk"
+            >
+
+                <form
+                    id="filter-form"
+                    class="filter-form"
+                >
+
+
+                    <!-- SEARCH -->
+
+                    <div
+                        class="filter-group"
+                    >
+
+                        <label
+                            for="search"
+                        >
+                            Cari Produk
+                        </label>
+
+                        <input
+                            id="search"
+                            class="filter-input"
+                            type="text"
+                            name="search"
+                            value="<%= currentSearch %>"
+                            placeholder="Contoh: Beras, Minyak, Gula..."
+                            autocomplete="off"
+                            aria-label="Cari produk berdasarkan nama"
+                        >
+
+                    </div>
+
+
+                    <!-- CATEGORY -->
+
+                    <div
+                        class="filter-group"
+                    >
+
+                        <label
+                            for="kategori"
+                        >
+                            Kategori
+                        </label>
+
+                        <select
+                            id="kategori"
+                            class="filter-select"
+                            name="kategori"
+                            aria-label="Filter berdasarkan kategori"
+                        >
+
+                            <option
+                                value=""
+                                <%= currentKategori === ""
+                                    ? "selected"
+                                    : "" %>
+                            >
+                                Semua Kategori
+                            </option>
+
+
+                            <% categoryList.forEach(category => { %>
+
+                                <option
+                                    value="<%= category %>"
+                                    <%= currentKategori === category
+                                        ? "selected"
+                                        : "" %>
+                                >
+                                    <%= category %>
+                                </option>
+
+                            <% }) %>
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- BUTTON -->
+
+                    <div
+                        class="filter-actions"
+                    >
+
+                        <button
+                            type="submit"
+                            class="btn-filter"
+                        >
+                            Cari Produk
+                        </button>
+
+                        <button
+                            type="button"
+                            id="reset-filter"
+                            class="btn-reset"
+                        >
+                            Reset
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </section>
+
+
+            <!-- ==========================
+                 MESSAGE
+            =========================== -->
+
+            <div
+                id="product-message"
+                aria-live="polite"
+            ></div>
+
+
+            <!-- ==========================
+                 PRODUCT HEADER
+            =========================== -->
+
+            <section
+                class="product-list-header"
+            >
+
+                <h2>
+                    Produk Tersedia
+                </h2>
+
+                <span
+                    id="product-count"
+                >
+                    Memuat...
+                </span>
+
+            </section>
+
+
+            <!-- ==========================
+                 PRODUCT LIST
+            =========================== -->
+
+            <section
+                aria-label="Daftar produk"
+            >
+
+                <div
+                    id="product-container"
+                    class="products-grid"
+                >
+
+                    <!--
+                        Data produk dimuat
+                        menggunakan Fetch API
+                    -->
+
+                </div>
+
+            </section>
+
+
+        </div>
+
+    </main>
+
+
+    <!-- ==========================
+         FOOTER
+    =========================== -->
+
+    <%- include("partials/footer") %>
+
+
+    <!-- ==========================
+         JAVASCRIPT
+    =========================== -->
+
+    <script
+        src="/js/script.js"
+    ></script>
+
+    <script
+        src="/js/products.js"
+    ></script>
+
+
+</body>
+
+</html>

@@ -1,47 +1,204 @@
 document.addEventListener("DOMContentLoaded", () => {
 
-    // ==========================
-    // ELEMENT
-    // ==========================
-
-    const productContainer =
-        document.getElementById("productContainer");
+    const filterForm =
+        document.getElementById("filter-form");
 
     const searchInput =
         document.getElementById("search");
 
-    const categoryFilter =
+    const kategoriSelect =
         document.getElementById("kategori");
 
-    const productMessage =
-        document.getElementById("productMessage");
+    const resetButton =
+        document.getElementById("reset-filter");
+
+    const productContainer =
+        document.getElementById("product-container");
 
     const productCount =
-        document.getElementById("productCount");
+        document.getElementById("product-count");
 
-    const filterForm =
-        document.getElementById("filterForm");
-
-
-    // ==========================
-    // DATA
-    // ==========================
-
-    let products = [];
+    const productMessage =
+        document.getElementById("product-message");
 
 
-    // ==========================
-    // GET PRODUCTS
-    // ==========================
+    // ======================================================
+    // FORMAT HARGA
+    // ======================================================
+
+    function formatRupiah(price) {
+
+        return new Intl.NumberFormat(
+            "id-ID",
+            {
+                style: "currency",
+                currency: "IDR",
+                maximumFractionDigits: 0
+            }
+        ).format(price);
+
+    }
+
+
+    // ======================================================
+    // ESCAPE HTML
+    // MENCEGAH XSS
+    // ======================================================
+
+    function escapeHTML(value) {
+
+        return String(value)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+
+    }
+
+
+    // ======================================================
+    // TAMPILKAN MESSAGE
+    // ======================================================
+
+    function showMessage(
+        message,
+        type = "loading"
+    ) {
+
+        productMessage.innerHTML = `
+            <div class="product-message ${type}">
+                ${escapeHTML(message)}
+            </div>
+        `;
+
+    }
+
+
+    // ======================================================
+    // HAPUS MESSAGE
+    // ======================================================
+
+    function clearMessage() {
+
+        productMessage.innerHTML = "";
+
+    }
+
+
+    // ======================================================
+    // RENDER PRODUCTS
+    // ======================================================
+
+    function renderProducts(products) {
+
+        productContainer.innerHTML = "";
+
+        productCount.textContent =
+            `${products.length} produk`;
+
+
+        // ==========================
+        // TIDAK ADA PRODUK
+        // ==========================
+
+        if (!products.length) {
+
+            productContainer.innerHTML = `
+                <div class="empty-state">
+
+                    <h3>
+                        Produk tidak ditemukan
+                    </h3>
+
+                    <p>
+                        Coba gunakan kata kunci
+                        atau kategori lainnya.
+                    </p>
+
+                </div>
+            `;
+
+            return;
+
+        }
+
+
+        // ==========================
+        // RENDER CARD
+        // ==========================
+
+        products.forEach(product => {
+
+            const stock =
+                Number(product.stock);
+
+            const stockClass =
+                stock > 0
+                    ? "available"
+                    : "empty";
+
+            const stockText =
+                stock > 0
+                    ? `Stok: ${stock}`
+                    : "Stok habis";
+
+
+            const card =
+                document.createElement("article");
+
+            card.className =
+                "product-card";
+
+
+            card.innerHTML = `
+
+                <span class="product-category">
+                    ${escapeHTML(product.category)}
+                </span>
+
+                <h3 class="product-name">
+                    ${escapeHTML(product.name)}
+                </h3>
+
+                <div class="product-price">
+                    ${formatRupiah(product.price)}
+                </div>
+
+                <div class="product-stock ${stockClass}">
+                    ${stockText}
+                </div>
+
+                <a
+                    href="/produk/${encodeURIComponent(product.id)}"
+                    class="product-detail-link"
+                    aria-label="Lihat detail ${escapeHTML(product.name)}"
+                >
+                    Lihat Detail
+                </a>
+
+            `;
+
+
+            productContainer.appendChild(card);
+
+        });
+
+    }
+
+
+    // ======================================================
+    // LOAD PRODUCTS
+    // ======================================================
 
     async function loadProducts() {
 
         try {
 
             showMessage(
-                "Memuat data produk...",
-                "loading"
+                "Memuat data produk..."
             );
+
 
             const response =
                 await fetch("/api/products", {
@@ -56,6 +213,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 await response.json();
 
 
+            // ==========================
+            // CEK RESPONSE API
+            // ==========================
+
             if (!response.ok) {
 
                 throw new Error(
@@ -66,42 +227,95 @@ document.addEventListener("DOMContentLoaded", () => {
             }
 
 
-            products =
-                Array.isArray(result.data)
-                    ? result.data
-                    : [];
+            if (
+                result.status !== "success" ||
+                !Array.isArray(result.data)
+            ) {
+
+                throw new Error(
+                    "Format response API tidak valid"
+                );
+
+            }
 
 
-            populateCategories();
+            clearMessage();
 
-            renderProducts();
+
+            // ==========================
+            // FILTER
+            // ==========================
+
+            const search =
+                searchInput.value
+                    .trim()
+                    .toLowerCase();
+
+            const kategori =
+                kategoriSelect.value
+                    .trim()
+                    .toLowerCase();
+
+
+            let filteredProducts =
+                result.data;
+
+
+            // ==========================
+            // SEARCH NAMA
+            // ==========================
+
+            if (search) {
+
+                filteredProducts =
+                    filteredProducts.filter(
+                        product =>
+                            String(product.name)
+                                .toLowerCase()
+                                .includes(search)
+                    );
+
+            }
+
+
+            // ==========================
+            // FILTER KATEGORI
+            // ==========================
+
+            if (kategori) {
+
+                filteredProducts =
+                    filteredProducts.filter(
+                        product =>
+                            String(product.category)
+                                .toLowerCase() === kategori
+                    );
+
+            }
+
+
+            renderProducts(
+                filteredProducts
+            );
 
 
         } catch (error) {
 
             console.error(
-                "Gagal mengambil produk:",
+                "Load products error:",
                 error
             );
 
 
-            products = [];
+            productContainer.innerHTML = "";
 
-
-            if (productContainer) {
-                productContainer.innerHTML = "";
-            }
-
-
-            if (productCount) {
-                productCount.textContent =
-                    "0 Produk";
-            }
+            productCount.textContent =
+                "0 produk";
 
 
             showMessage(
                 error.message ||
-                "Gagal mengambil data produk.",
+                "Gagal mengambil data produk",
                 "error"
             );
 
@@ -110,947 +324,60 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
 
-    // ==========================
-    // CATEGORY
-    // ==========================
+    // ======================================================
+    // FILTER SUBMIT
+    // ======================================================
 
-    function populateCategories() {
+    filterForm.addEventListener(
+        "submit",
+        async (event) => {
 
-        if (!categoryFilter) {
-            return;
-        }
+            event.preventDefault();
 
-
-        const categories = [
-            ...new Set(
-                products
-                    .map(
-                        product =>
-                            product.category
-                    )
-                    .filter(Boolean)
-            )
-        ].sort();
-
-
-        categoryFilter.innerHTML = `
-            <option value="">
-                Semua Kategori
-            </option>
-        `;
-
-
-        categories.forEach(
-            (category) => {
-
-                const option =
-                    document.createElement(
-                        "option"
-                    );
-
-
-                option.value =
-                    category;
-
-
-                option.textContent =
-                    category;
-
-
-                categoryFilter.appendChild(
-                    option
-                );
-
-            }
-        );
-
-    }
-
-
-    // ==========================
-    // FILTER
-    // ==========================
-
-    function getFilteredProducts() {
-
-        const search =
-            searchInput
-                ? searchInput.value
-                    .trim()
-                    .toLowerCase()
-                : "";
-
-
-        const category =
-            categoryFilter
-                ? categoryFilter.value
-                : "";
-
-
-        return products.filter(
-            (product) => {
-
-                const productName =
-                    String(
-                        product.name || ""
-                    ).toLowerCase();
-
-
-                const productCategory =
-                    String(
-                        product.category || ""
-                    ).toLowerCase();
-
-
-                const matchesSearch =
-                    !search ||
-                    productName.includes(
-                        search
-                    );
-
-
-                const matchesCategory =
-                    !category ||
-                    productCategory ===
-                    category.toLowerCase();
-
-
-                return (
-                    matchesSearch &&
-                    matchesCategory
-                );
-
-            }
-        );
-
-    }
-
-
-    // ==========================
-    // RENDER PRODUCTS
-    // ==========================
-
-    function renderProducts() {
-
-        if (!productContainer) {
-            return;
-        }
-
-
-        const filteredProducts =
-            getFilteredProducts();
-
-
-        productContainer.innerHTML = "";
-
-
-        // JUMLAH PRODUK
-        if (productCount) {
-
-            productCount.textContent =
-                `${filteredProducts.length} Produk`;
+            await loadProducts();
 
         }
+    );
 
 
-        // TIDAK ADA PRODUK
-        if (
-            filteredProducts.length === 0
-        ) {
-
-            showEmptyState();
-
-            return;
-
-        }
-
-
-        hideMessage();
-
-
-        // RENDER CARD
-        filteredProducts.forEach(
-            (product) => {
-
-                const card =
-                    document.createElement(
-                        "article"
-                    );
-
-
-                card.className =
-                    "product-card";
-
-
-                card.style.cssText = `
-                    background:#fff;
-                    border:1px solid #e7e5df;
-                    border-radius:18px;
-                    overflow:hidden;
-                    transition:
-                        transform .2s ease,
-                        box-shadow .2s ease;
-                `;
-
-
-                const stock =
-                    Number(product.stock);
-
-
-                const price =
-                    Number(product.price);
-
-
-                const stockAvailable =
-                    stock > 0;
-
-
-                const stockColor =
-                    stockAvailable
-                        ? "#22c55e"
-                        : "#dc3545";
-
-
-                const stockText =
-                    stockAvailable
-                        ? "Stok tersedia"
-                        : "Stok habis";
-
-
-                card.innerHTML = `
-
-                    <!-- ICON AREA -->
-
-                    <div
-                        style="
-                            height:205px;
-                            display:flex;
-                            align-items:center;
-                            justify-content:center;
-                            background:
-                                linear-gradient(
-                                    145deg,
-                                    #f5faf6,
-                                    #fffaf0
-                                );
-                            overflow:hidden;
-                        "
-                    >
-
-                        <div
-                            style="
-                                width:98px;
-                                height:98px;
-                                display:flex;
-                                align-items:center;
-                                justify-content:center;
-                                background:#fff;
-                                border:1px solid #e0ebe3;
-                                border-radius:25px;
-                                box-shadow:
-                                    0 14px 28px
-                                    rgba(31,70,48,.08);
-                            "
-                            aria-hidden="true"
-                        >
-
-                            ${getProductIcon(
-                                product.category
-                            )}
-
-                        </div>
-
-                    </div>
-
-
-                    <!-- CONTENT -->
-
-                    <div
-                        style="
-                            padding:20px;
-                        "
-                    >
-
-                        <!-- CATEGORY -->
-
-                        <span
-                            style="
-                                color:#1f7a4d;
-                                font-size:10px;
-                                font-weight:850;
-                                letter-spacing:.8px;
-                                text-transform:uppercase;
-                            "
-                        >
-                            ${escapeHTML(
-                                product.category
-                            )}
-                        </span>
-
-
-                        <!-- NAME -->
-
-                        <h3
-                            style="
-                                min-height:48px;
-                                margin:8px 0 0;
-                                color:#26352d;
-                                font-size:17px;
-                                line-height:1.4;
-                            "
-                        >
-                            ${escapeHTML(
-                                product.name
-                            )}
-                        </h3>
-
-
-                        <!-- PRICE -->
-
-                        <div
-                            style="
-                                margin-top:14px;
-                                color:#1f7a4d;
-                                font-size:23px;
-                                font-weight:850;
-                            "
-                        >
-                            Rp ${price.toLocaleString(
-                                "id-ID"
-                            )}
-                        </div>
-
-
-                        <!-- STOCK -->
-
-                        <div
-                            style="
-                                margin-top:6px;
-                                color:#929a95;
-                                font-size:11px;
-                            "
-                        >
-
-                            <span
-                                style="
-                                    display:inline-block;
-                                    width:7px;
-                                    height:7px;
-                                    margin-right:4px;
-                                    background:${stockColor};
-                                    border-radius:50%;
-                                "
-                            ></span>
-
-                            ${stockText}:
-
-                            <strong
-                                style="
-                                    color:#5c6961;
-                                "
-                            >
-                                ${stock}
-                            </strong>
-
-                        </div>
-
-
-                        <!-- DETAIL -->
-
-                        <a
-                            href="/produk/${product.id}"
-                            class="primary-btn"
-                            style="
-                                display:block;
-                                margin-top:18px;
-                                padding:11px;
-                                background:#1f7a4d;
-                                color:#fff;
-                                border-radius:10px;
-                                text-align:center;
-                                font-size:12px;
-                                font-weight:800;
-                                text-decoration:none;
-                            "
-                        >
-                            Lihat Detail Produk →
-                        </a>
-
-                    </div>
-
-                `;
-
-
-                // HOVER
-
-                card.addEventListener(
-                    "mouseenter",
-                    () => {
-
-                        card.style.transform =
-                            "translateY(-4px)";
-
-                        card.style.boxShadow =
-                            "0 12px 30px rgba(31,41,55,.08)";
-
-                    }
-                );
-
-
-                card.addEventListener(
-                    "mouseleave",
-                    () => {
-
-                        card.style.transform =
-                            "translateY(0)";
-
-                        card.style.boxShadow =
-                            "none";
-
-                    }
-                );
-
-
-                productContainer.appendChild(
-                    card
-                );
-
-            }
-        );
-
-    }
-
-
-    // ==========================
-    // PRODUCT ICON
-    // ==========================
-
-    function getProductIcon(category) {
-
-        const value =
-            String(category || "")
-                .toLowerCase();
-
-
-        /*
-         * Icon dibuat menggunakan SVG sederhana.
-         * Tidak menggunakan emoji.
-         */
-
-        if (
-            value.includes("beras")
-        ) {
-
-            return `
-                <svg
-                    viewBox="0 0 64 64"
-                    width="54"
-                    height="54"
-                    fill="none"
-                    stroke="#1f7a4d"
-                    stroke-width="3"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                >
-                    <path d="M20 13h24"/>
-                    <path d="M22 13l-4 36h28l-4-36"/>
-                    <path d="M18 25h28"/>
-                    <path d="M22 35h20"/>
-                    <path d="M27 43h10"/>
-                </svg>
-            `;
-
-        }
-
-
-        if (
-            value.includes("minyak")
-        ) {
-
-            return `
-                <svg
-                    viewBox="0 0 64 64"
-                    width="54"
-                    height="54"
-                    fill="none"
-                    stroke="#1f7a4d"
-                    stroke-width="3"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                >
-                    <path d="M25 10h14"/>
-                    <path d="M27 10v8"/>
-                    <path d="M37 10v8"/>
-                    <path d="M22 18h20"/>
-                    <path d="M20 18v34h24V18"/>
-                    <path d="M26 29h12"/>
-                    <path d="M26 37h12"/>
-                </svg>
-            `;
-
-        }
-
-
-        if (
-            value.includes("gula")
-        ) {
-
-            return `
-                <svg
-                    viewBox="0 0 64 64"
-                    width="54"
-                    height="54"
-                    fill="none"
-                    stroke="#1f7a4d"
-                    stroke-width="3"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                >
-                    <path d="M16 20h32v30H16z"/>
-                    <path d="M16 20l8-8h24l-8 8"/>
-                    <path d="M48 20v30"/>
-                    <path d="M25 29h14"/>
-                    <path d="M25 37h10"/>
-                </svg>
-            `;
-
-        }
-
-
-        if (
-            value.includes("tepung")
-        ) {
-
-            return `
-                <svg
-                    viewBox="0 0 64 64"
-                    width="54"
-                    height="54"
-                    fill="none"
-                    stroke="#1f7a4d"
-                    stroke-width="3"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                >
-                    <path d="M19 14h26"/>
-                    <path d="M21 14l-3 38h28l-3-38"/>
-                    <path d="M20 24h24"/>
-                    <path d="M25 34h14"/>
-                    <path d="M25 42h9"/>
-                </svg>
-            `;
-
-        }
-
-
-        if (
-            value.includes("mie")
-        ) {
-
-            return `
-                <svg
-                    viewBox="0 0 64 64"
-                    width="54"
-                    height="54"
-                    fill="none"
-                    stroke="#1f7a4d"
-                    stroke-width="3"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                >
-                    <path d="M13 22h38"/>
-                    <path d="M16 22l3 30h26l3-30"/>
-                    <path d="M20 31c6-6 12 6 18 0s10 0 10 0"/>
-                    <path d="M21 40c6-6 12 6 18 0s10 0 10 0"/>
-                </svg>
-            `;
-
-        }
-
-
-        if (
-            value.includes("telur")
-        ) {
-
-            return `
-                <svg
-                    viewBox="0 0 64 64"
-                    width="54"
-                    height="54"
-                    fill="none"
-                    stroke="#1f7a4d"
-                    stroke-width="3"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                >
-                    <path d="M32 11c-8 0-16 14-16 25 0 11 7 17 16 17s16-6 16-17c0-11-8-25-16-25Z"/>
-                </svg>
-            `;
-
-        }
-
-
-        if (
-            value.includes("minuman")
-        ) {
-
-            return `
-                <svg
-                    viewBox="0 0 64 64"
-                    width="54"
-                    height="54"
-                    fill="none"
-                    stroke="#1f7a4d"
-                    stroke-width="3"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                >
-                    <path d="M22 11h20"/>
-                    <path d="M24 11l2 40h12l2-40"/>
-                    <path d="M25 21h14"/>
-                    <path d="M28 31h8"/>
-                </svg>
-            `;
-
-        }
-
-
-        if (
-            value.includes("bumbu")
-        ) {
-
-            return `
-                <svg
-                    viewBox="0 0 64 64"
-                    width="54"
-                    height="54"
-                    fill="none"
-                    stroke="#1f7a4d"
-                    stroke-width="3"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                >
-                    <path d="M18 20h28"/>
-                    <path d="M21 20l3 31h16l3-31"/>
-                    <path d="M25 14h14"/>
-                    <path d="M27 34h10"/>
-                </svg>
-            `;
-
-        }
-
-
-        // DEFAULT ICON
-
-        return `
-            <svg
-                viewBox="0 0 64 64"
-                width="54"
-                height="54"
-                fill="none"
-                stroke="#1f7a4d"
-                stroke-width="3"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-            >
-                <path d="M10 22h44"/>
-                <path d="M14 22l3 30h30l3-30"/>
-                <path d="M22 22a10 10 0 0 1 20 0"/>
-                <path d="M22 34h20"/>
-            </svg>
-        `;
-
-    }
-
-
-    // ==========================
-    // EMPTY STATE
-    // ==========================
-
-    function showEmptyState() {
-
-        if (!productContainer) {
-            return;
-        }
-
-
-        productContainer.innerHTML = `
-
-            <div
-                style="
-                    grid-column:1/-1;
-                    padding:65px 25px;
-                    background:#fff;
-                    border:1px solid #e7e5df;
-                    border-radius:18px;
-                    text-align:center;
-                "
-            >
-
-                <div
-                    style="
-                        width:70px;
-                        height:70px;
-                        margin:0 auto 18px;
-                        display:flex;
-                        align-items:center;
-                        justify-content:center;
-                        background:#eaf7ef;
-                        border-radius:50%;
-                    "
-                >
-
-                    <svg
-                        viewBox="0 0 24 24"
-                        width="32"
-                        height="32"
-                        fill="none"
-                        stroke="#1f7a4d"
-                        stroke-width="1.8"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        aria-hidden="true"
-                    >
-                        <circle
-                            cx="10.8"
-                            cy="10.8"
-                            r="6.8"
-                        />
-
-                        <path d="m16 16 4 4"/>
-
-                    </svg>
-
-                </div>
-
-
-                <h3
-                    style="
-                        margin:0;
-                        color:#173326;
-                        font-size:20px;
-                    "
-                >
-                    Produk tidak ditemukan
-                </h3>
-
-
-                <p
-                    style="
-                        max-width:420px;
-                        margin:8px auto 20px;
-                        color:#727b75;
-                        font-size:13px;
-                    "
-                >
-                    Coba gunakan kata kunci lain
-                    atau pilih kategori yang berbeda.
-                </p>
-
-
-                <button
-                    type="button"
-                    id="resetFilter"
-                    style="
-                        display:inline-block;
-                        padding:10px 18px;
-                        background:#1f7a4d;
-                        color:#fff;
-                        border:none;
-                        border-radius:10px;
-                        font-size:12px;
-                        font-weight:800;
-                        cursor:pointer;
-                    "
-                >
-                    Lihat Semua Produk
-                </button>
-
-            </div>
-
-        `;
-
-
-        const resetButton =
-            document.getElementById(
-                "resetFilter"
-            );
-
-
-        if (resetButton) {
-
-            resetButton.addEventListener(
-                "click",
-                resetFilters
-            );
-
-        }
-
-    }
-
-
-    // ==========================
+    // ======================================================
     // RESET FILTER
-    // ==========================
+    // ======================================================
 
-    function resetFilters() {
+    resetButton.addEventListener(
+        "click",
+        async () => {
 
-        if (searchInput) {
             searchInput.value = "";
-        }
 
+            kategoriSelect.value = "";
 
-        if (categoryFilter) {
-            categoryFilter.value = "";
-        }
-
-
-        renderProducts();
-
-    }
-
-
-    // ==========================
-    // MESSAGE
-    // ==========================
-
-    function showMessage(
-        message,
-        type = "loading"
-    ) {
-
-        if (!productMessage) {
-            return;
-        }
-
-
-        productMessage.textContent =
-            message;
-
-
-        productMessage.style.display =
-            "block";
-
-
-        if (type === "error") {
-
-            productMessage.style.background =
-                "#f8d7da";
-
-            productMessage.style.color =
-                "#842029";
-
-        } else if (type === "empty") {
-
-            productMessage.style.background =
-                "#fff3cd";
-
-            productMessage.style.color =
-                "#664d03";
-
-        } else {
-
-            productMessage.style.background =
-                "#eaf7ef";
-
-            productMessage.style.color =
-                "#1f7a4d";
+            await loadProducts();
 
         }
-
-    }
-
-
-    // ==========================
-    // HIDE MESSAGE
-    // ==========================
-
-    function hideMessage() {
-
-        if (!productMessage) {
-            return;
-        }
+    );
 
 
-        productMessage.style.display =
-            "none";
+    // ======================================================
+    // FILTER SAAT MENGETIK
+    // ENTER TETAP BISA DIGUNAKAN
+    // ======================================================
 
-    }
+    searchInput.addEventListener(
+        "keydown",
+        event => {
 
-
-    // ==========================
-    // ESCAPE HTML
-    // ==========================
-
-    function escapeHTML(value) {
-
-        const div =
-            document.createElement(
-                "div"
-            );
-
-
-        div.textContent =
-            value ?? "";
-
-
-        return div.innerHTML;
-
-    }
-
-
-    // ==========================
-    // SEARCH
-    // ==========================
-
-    if (searchInput) {
-
-        searchInput.addEventListener(
-            "input",
-            renderProducts
-        );
-
-    }
-
-
-    // ==========================
-    // CATEGORY
-    // ==========================
-
-    if (categoryFilter) {
-
-        categoryFilter.addEventListener(
-            "change",
-            renderProducts
-        );
-
-    }
-
-
-    // ==========================
-    // FORM
-    // ==========================
-
-    if (filterForm) {
-
-        filterForm.addEventListener(
-            "submit",
-            (event) => {
+            if (event.key === "Enter") {
 
                 event.preventDefault();
 
-                renderProducts();
+                filterForm.requestSubmit();
 
             }
-        );
 
-    }
-
-
-    // ==========================
-    // INITIAL LOAD
-    // ==========================
-
+        }
+    );
+    
     loadProducts();
 
 });

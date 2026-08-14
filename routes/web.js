@@ -21,8 +21,6 @@ router.get(
     "/login",
     (req, res) => {
 
-        // Jika admin sudah login,
-        // langsung arahkan ke dashboard
         if (
             req.session &&
             req.session.admin
@@ -81,7 +79,6 @@ router.get(
 
         try {
 
-            // Ambil 3 produk terbaru berdasarkan ID
             const products =
                 await Product.findAll({
                     order: [
@@ -117,26 +114,88 @@ router.get(
 // ======================================================
 // HALAMAN PRODUK
 // PUBLIC
-//
-// Sprint 2:
-// Data produk ditampilkan melalui Fetch API
-// dari GET /api/products
 // ======================================================
 
 router.get(
     "/produk",
-    (req, res) => {
+    async (req, res, next) => {
 
-        return res.render(
-            "products",
-            {
-                title:
-                    "Daftar Produk",
+        try {
 
-                currentPage:
-                    "produk"
-            }
-        );
+            // ======================
+            // AMBIL QUERY STRING
+            // ======================
+
+            const search =
+                typeof req.query.search === "string"
+                    ? req.query.search.trim()
+                    : "";
+
+            const kategori =
+                typeof req.query.kategori === "string"
+                    ? req.query.kategori.trim()
+                    : "";
+
+
+            // ======================
+            // AMBIL SEMUA KATEGORI
+            // ======================
+
+            const categoryRows =
+                await Product.findAll({
+                    attributes: [
+                        "category"
+                    ],
+                    group: [
+                        "category"
+                    ],
+                    order: [
+                        ["category", "ASC"]
+                    ],
+                    raw: true
+                });
+
+
+            const categories =
+                categoryRows
+                    .map(
+                        item =>
+                            item.category
+                    )
+                    .filter(Boolean);
+
+
+            // ======================
+            // RENDER HALAMAN
+            // ======================
+
+            return res.render(
+                "products",
+                {
+                    title:
+                        "Daftar Produk",
+
+                    currentPage:
+                        "produk",
+
+                    search,
+
+                    kategori,
+
+                    categories
+                }
+            );
+
+        } catch (error) {
+
+            console.error(
+                "Products page error:",
+                error
+            );
+
+            next(error);
+
+        }
 
     }
 );
@@ -183,7 +242,7 @@ router.get(
 
 
             // ======================
-            // CARI PRODUK DI DATABASE
+            // CARI PRODUK
             // ======================
 
             const product =
@@ -211,7 +270,7 @@ router.get(
 
 
             // ======================
-            // TAMPILKAN DETAIL
+            // DETAIL PRODUK
             // ======================
 
             return res.render(

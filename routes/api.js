@@ -1,5 +1,6 @@
 const express = require("express");
 const bcrypt = require("bcrypt");
+const { Op } = require("sequelize");
 
 const router = express.Router();
 
@@ -196,38 +197,119 @@ router.post("/logout", (req, res) => {
 // ======================================================
 // GET /api/products
 // PUBLIC
+// SUPPORT SEARCH + CATEGORY FILTER
 // ======================================================
-router.get("/products", async (req, res) => {
 
-    try {
+router.get(
+    "/products",
+    async (req, res) => {
 
-        const products = await Product.findAll({
-            order: [
-                ["id", "ASC"]
-            ]
-        });
+        try {
 
-        return res.status(200).json({
-            status: "success",
-            message: "Data produk berhasil diambil",
-            data: products
-        });
+            // ======================
+            // QUERY STRING
+            // ======================
 
-    } catch (error) {
+            const search =
+                typeof req.query.search === "string"
+                    ? req.query.search.trim()
+                    : "";
 
-        console.error(
-            "GET products error:",
-            error
-        );
+            const kategori =
+                typeof req.query.kategori === "string"
+                    ? req.query.kategori.trim()
+                    : "";
 
-        return res.status(500).json({
-            status: "error",
-            message: "Gagal mengambil data produk"
-        });
+
+            // ======================
+            // FILTER DATABASE
+            // ======================
+
+            const where = {};
+
+
+            // ======================
+            // SEARCH NAMA PRODUK
+            // ======================
+
+            if (search) {
+
+                where.name = {
+                    [Op.iLike]:
+                        `%${search}%`
+                };
+
+            }
+
+
+            // ======================
+            // FILTER KATEGORI
+            // ======================
+
+            if (kategori) {
+
+                where.category = {
+                    [Op.iLike]:
+                        kategori
+                };
+
+            }
+
+
+            // ======================
+            // AMBIL DATA
+            // ======================
+
+            const products =
+                await Product.findAll({
+
+                    where,
+
+                    order: [
+                        ["id", "ASC"]
+                    ]
+
+                });
+
+
+            // ======================
+            // RESPONSE
+            // ======================
+
+            return res.status(200).json({
+
+                status:
+                    "success",
+
+                message:
+                    "Data produk berhasil diambil",
+
+                data:
+                    products
+
+            });
+
+        } catch (error) {
+
+            console.error(
+                "GET products error:",
+                error
+            );
+
+            return res.status(500).json({
+
+                status:
+                    "error",
+
+                message:
+                    "Gagal mengambil data produk"
+
+            });
+
+        }
 
     }
-
-});
+);
 
 
 // ======================================================
