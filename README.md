@@ -199,8 +199,8 @@ Akun admin digunakan untuk mengakses dashboard dan melakukan pengelolaan produk.
 
 | Field    | Value                    |
 | -------- | ------------------------ |
-| Username | **[ISI USERNAME ADMIN]** |
-| Password | **[ISI PASSWORD ADMIN]** |
+| Username | **admin**                |
+| Password | **admin123**             |
 
 > Sesuaikan bagian ini dengan kredensial yang benar-benar digunakan pada project.
 
@@ -217,7 +217,7 @@ GET /
 ```
 
 Halaman utama website Toko Sembako Ariesta yang menampilkan informasi toko dan beberapa produk.
-
+<img width="1440" height="778" alt="Screen Shot 2026-08-14 at 17 48 13" src="https://github.com/user-attachments/assets/b09b38f4-4a8a-4dd8-92cc-93777eb8bdef" />
 ---
 
 ## 🛒 2. Produk
@@ -229,6 +229,7 @@ GET /produk
 ```
 
 Menampilkan daftar produk sembako yang tersedia.
+<img width="1440" height="777" alt="Screen Shot 2026-08-14 at 17 49 37" src="https://github.com/user-attachments/assets/2aab98e8-dc68-4191-9c5c-fdaece6be806" />
 
 Halaman produk mendukung:
 
@@ -267,6 +268,7 @@ Contoh:
 ```
 
 Menampilkan informasi detail berdasarkan ID produk.
+<img width="1437" height="776" alt="Screen Shot 2026-08-14 at 17 50 12" src="https://github.com/user-attachments/assets/ae798f9c-ce0b-42c8-a73a-b07d1d120f25" />
 
 Jika produk tidak ditemukan, aplikasi menampilkan halaman/pesan yang sesuai tanpa menyebabkan server crash.
 
@@ -281,6 +283,7 @@ GET /tanya-ai
 ```
 
 Halaman Tanya AI memungkinkan pelanggan mengirim pertanyaan mengenai toko.
+<img width="1437" height="778" alt="Screen Shot 2026-08-14 at 17 51 15" src="https://github.com/user-attachments/assets/46df3028-a1cd-4e1c-b5a6-f7599dcc915f" />
 
 Pertanyaan dikirim menggunakan Fetch API ke backend dan mendapatkan balasan dari logika AI dummy.
 
@@ -295,6 +298,7 @@ GET /login
 ```
 
 Digunakan oleh admin/kasir untuk masuk ke sistem.
+<img width="1440" height="778" alt="Screen Shot 2026-08-14 at 17 51 46" src="https://github.com/user-attachments/assets/91da0b95-00e8-4a36-b5c0-bd22f64b7fd5" />
 
 Login menggunakan:
 
@@ -313,6 +317,7 @@ GET /dashboard
 ```
 
 Dashboard hanya dapat diakses oleh user yang sudah login.
+<img width="1440" height="778" alt="Screen Shot 2026-08-14 at 17 52 04" src="https://github.com/user-attachments/assets/5b2aec1a-4477-47d3-bceb-f4d79cd2eee2" />
 
 Admin dapat:
 
