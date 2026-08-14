@@ -399,5 +399,139 @@ router.delete(
 
     }
 );
+// ======================
+// POST /api/chat
+// PUBLIC - DUMMY AI
+// ======================
+router.post("/chat", async (req, res) => {
+    try {
+        const { question } = req.body;
+
+        // Validasi pertanyaan
+        if (!question || !question.trim()) {
+            return res.status(400).json({
+                status: "error",
+                message: "Pertanyaan wajib diisi"
+            });
+        }
+
+        const userQuestion = question.trim();
+        const lowerQuestion = userQuestion.toLowerCase();
+
+        let answer;
+
+        // ======================
+        // JAM BUKA
+        // ======================
+        if (
+            lowerQuestion.includes("jam buka") ||
+            lowerQuestion.includes("buka jam") ||
+            lowerQuestion.includes("jam berapa") ||
+            lowerQuestion.includes("buka")
+        ) {
+            answer =
+                "Toko Ariesta buka setiap hari pukul 08.00 sampai 21.00.";
+        }
+
+        // ======================
+        // ONGKIR / PENGANTARAN
+        // ======================
+        else if (
+            lowerQuestion.includes("ongkir") ||
+            lowerQuestion.includes("antar") ||
+            lowerQuestion.includes("pengantaran") ||
+            lowerQuestion.includes("delivery")
+        ) {
+            answer =
+                "Untuk informasi ongkir dan area pengantaran, silakan hubungi Toko Ariesta secara langsung.";
+        }
+
+        // ======================
+        // PEMBAYARAN
+        // ======================
+        else if (
+            lowerQuestion.includes("bayar") ||
+            lowerQuestion.includes("pembayaran") ||
+            lowerQuestion.includes("payment")
+        ) {
+            answer =
+                "Toko Ariesta menerima pembayaran sesuai metode pembayaran yang tersedia di toko.";
+        }
+
+        // ======================
+        // CARI PRODUK / STOK
+        // ======================
+        else if (
+            lowerQuestion.includes("stok") ||
+            lowerQuestion.includes("tersedia") ||
+            lowerQuestion.includes("ada")
+        ) {
+            const products = await Product.findAll({
+                order: [["name", "ASC"]]
+            });
+
+            // Cari produk berdasarkan nama
+            const matchedProduct = products.find(product =>
+                lowerQuestion.includes(
+                    product.name.toLowerCase()
+                )
+            );
+
+            if (matchedProduct) {
+                if (matchedProduct.stock > 0) {
+                    answer =
+                        `${matchedProduct.name} masih tersedia dengan stok ${matchedProduct.stock} item.`;
+                } else {
+                    answer =
+                        `${matchedProduct.name} sedang tidak tersedia karena stok habis.`;
+                }
+            } else {
+                const availableProducts = products.filter(
+                    product => product.stock > 0
+                );
+
+                if (availableProducts.length === 0) {
+                    answer =
+                        "Saat ini belum ada produk yang tersedia.";
+                } else {
+                    const productList = availableProducts
+                        .slice(0, 5)
+                        .map(product =>
+                            `${product.name} (stok ${product.stock})`
+                        )
+                        .join(", ");
+
+                    answer =
+                        `Beberapa produk yang tersedia saat ini: ${productList}.`;
+                }
+            }
+        }
+
+        // ======================
+        // DEFAULT
+        // ======================
+        else {
+            answer =
+                "Maaf, saya belum memahami pertanyaan tersebut. Kamu bisa bertanya tentang jam buka, stok produk, pengantaran, atau pembayaran.";
+        }
+
+        return res.status(200).json({
+            status: "success",
+            message: "Pertanyaan berhasil diproses",
+            data: {
+                question: userQuestion,
+                answer
+            }
+        });
+
+    } catch (error) {
+        console.error("Chat error:", error);
+
+        return res.status(500).json({
+            status: "error",
+            message: "Gagal memproses pertanyaan"
+        });
+    }
+});
 
 module.exports = router;
