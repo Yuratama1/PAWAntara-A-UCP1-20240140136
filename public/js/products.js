@@ -23,6 +23,29 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     // ======================================================
+    // CEK ELEMENT
+    // ======================================================
+
+    if (
+        !filterForm ||
+        !searchInput ||
+        !kategoriSelect ||
+        !resetButton ||
+        !productContainer ||
+        !productCount ||
+        !productMessage
+    ) {
+
+        console.error(
+            "Element produk/filter tidak ditemukan."
+        );
+
+        return;
+
+    }
+
+
+    // ======================================================
     // FORMAT HARGA
     // ======================================================
 
@@ -35,7 +58,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 currency: "IDR",
                 maximumFractionDigits: 0
             }
-        ).format(price);
+        ).format(Number(price) || 0);
 
     }
 
@@ -47,7 +70,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function escapeHTML(value) {
 
-        return String(value)
+        return String(value ?? "")
             .replace(/&/g, "&amp;")
             .replace(/</g, "&lt;")
             .replace(/>/g, "&gt;")
@@ -87,6 +110,92 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     // ======================================================
+    // UPDATE URL
+    // ======================================================
+
+    function updateURL() {
+
+        const search =
+            searchInput.value.trim();
+
+        const kategori =
+            kategoriSelect.value.trim();
+
+
+        const params =
+            new URLSearchParams();
+
+
+        if (search) {
+
+            params.set(
+                "search",
+                search
+            );
+
+        }
+
+
+        if (kategori) {
+
+            params.set(
+                "kategori",
+                kategori
+            );
+
+        }
+
+
+        const queryString =
+            params.toString();
+
+
+        const newURL =
+            queryString
+                ? `/produk?${queryString}`
+                : "/produk";
+
+
+        window.history.pushState(
+            {},
+            "",
+            newURL
+        );
+
+    }
+
+
+    // ======================================================
+    // LOAD FILTER DARI URL
+    // ======================================================
+
+    function loadFilterFromURL() {
+
+        const params =
+            new URLSearchParams(
+                window.location.search
+            );
+
+
+        const search =
+            params.get("search") || "";
+
+
+        const kategori =
+            params.get("kategori") || "";
+
+
+        searchInput.value =
+            search;
+
+
+        kategoriSelect.value =
+            kategori;
+
+    }
+
+
+    // ======================================================
     // RENDER PRODUCTS
     // ======================================================
 
@@ -98,9 +207,9 @@ document.addEventListener("DOMContentLoaded", () => {
             `${products.length} produk`;
 
 
-        // ==========================
+        // ==================================================
         // TIDAK ADA PRODUK
-        // ==========================
+        // ==================================================
 
         if (!products.length) {
 
@@ -124,19 +233,21 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
 
-        // ==========================
+        // ==================================================
         // RENDER CARD
-        // ==========================
+        // ==================================================
 
         products.forEach(product => {
 
             const stock =
                 Number(product.stock);
 
+
             const stockClass =
                 stock > 0
                     ? "available"
                     : "empty";
+
 
             const stockText =
                 stock > 0
@@ -146,6 +257,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             const card =
                 document.createElement("article");
+
 
             card.className =
                 "product-card";
@@ -165,8 +277,10 @@ document.addEventListener("DOMContentLoaded", () => {
                     ${formatRupiah(product.price)}
                 </div>
 
-                <div class="product-stock ${stockClass}">
-                    ${stockText}
+                <div
+                    class="product-stock ${stockClass}"
+                >
+                    ${escapeHTML(stockText)}
                 </div>
 
                 <a
@@ -180,7 +294,9 @@ document.addEventListener("DOMContentLoaded", () => {
             `;
 
 
-            productContainer.appendChild(card);
+            productContainer.appendChild(
+                card
+            );
 
         });
 
@@ -188,7 +304,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     // ======================================================
-    // LOAD PRODUCTS
+    // LOAD PRODUCTS DARI API
+    // FILTER DIPROSES DI SERVER / DATABASE
     // ======================================================
 
     async function loadProducts() {
@@ -200,22 +317,95 @@ document.addEventListener("DOMContentLoaded", () => {
             );
 
 
-            const response =
-                await fetch("/api/products", {
-                    method: "GET",
-                    headers: {
-                        "Accept": "application/json"
-                    }
-                });
+            // ==================================================
+            // AMBIL FILTER
+            // ==================================================
 
+            const search =
+                searchInput.value.trim();
+
+
+            const kategori =
+                kategoriSelect.value.trim();
+
+
+            // ==================================================
+            // BUAT QUERY STRING
+            // ==================================================
+
+            const params =
+                new URLSearchParams();
+
+
+            if (search) {
+
+                params.set(
+                    "search",
+                    search
+                );
+
+            }
+
+
+            if (kategori) {
+
+                params.set(
+                    "kategori",
+                    kategori
+                );
+
+            }
+
+
+            // ==================================================
+            // BUAT URL API
+            // ==================================================
+
+            const queryString =
+                params.toString();
+
+
+            const apiURL =
+                queryString
+                    ? `/api/products?${queryString}`
+                    : "/api/products";
+
+
+            console.log(
+                "Request API:",
+                apiURL
+            );
+
+
+            // ==================================================
+            // FETCH API
+            // ==================================================
+
+            const response =
+                await fetch(
+                    apiURL,
+                    {
+                        method: "GET",
+
+                        headers: {
+                            "Accept":
+                                "application/json"
+                        }
+                    }
+                );
+
+
+            // ==================================================
+            // PARSE JSON
+            // ==================================================
 
             const result =
                 await response.json();
 
 
-            // ==========================
-            // CEK RESPONSE API
-            // ==========================
+            // ==================================================
+            // CEK HTTP RESPONSE
+            // ==================================================
 
             if (!response.ok) {
 
@@ -226,6 +416,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
             }
 
+
+            // ==================================================
+            // CEK FORMAT RESPONSE
+            // ==================================================
 
             if (
                 result.status !== "success" ||
@@ -239,63 +433,19 @@ document.addEventListener("DOMContentLoaded", () => {
             }
 
 
+            // ==================================================
+            // HILANGKAN LOADING
+            // ==================================================
+
             clearMessage();
 
 
-            // ==========================
-            // FILTER
-            // ==========================
-
-            const search =
-                searchInput.value
-                    .trim()
-                    .toLowerCase();
-
-            const kategori =
-                kategoriSelect.value
-                    .trim()
-                    .toLowerCase();
-
-
-            let filteredProducts =
-                result.data;
-
-
-            // ==========================
-            // SEARCH NAMA
-            // ==========================
-
-            if (search) {
-
-                filteredProducts =
-                    filteredProducts.filter(
-                        product =>
-                            String(product.name)
-                                .toLowerCase()
-                                .includes(search)
-                    );
-
-            }
-
-
-            // ==========================
-            // FILTER KATEGORI
-            // ==========================
-
-            if (kategori) {
-
-                filteredProducts =
-                    filteredProducts.filter(
-                        product =>
-                            String(product.category)
-                                .toLowerCase() === kategori
-                    );
-
-            }
-
+            // ==================================================
+            // RENDER HASIL DARI SERVER
+            // ==================================================
 
             renderProducts(
-                filteredProducts
+                result.data
             );
 
 
@@ -308,6 +458,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
             productContainer.innerHTML = "";
+
 
             productCount.textContent =
                 "0 produk";
@@ -330,9 +481,47 @@ document.addEventListener("DOMContentLoaded", () => {
 
     filterForm.addEventListener(
         "submit",
-        async (event) => {
+        async event => {
 
             event.preventDefault();
+
+
+            // ==================================================
+            // VALIDASI DASAR
+            // ==================================================
+
+            const search =
+                searchInput.value.trim();
+
+
+            const kategori =
+                kategoriSelect.value.trim();
+
+
+            if (
+                search.length > 100
+            ) {
+
+                showMessage(
+                    "Pencarian terlalu panjang.",
+                    "error"
+                );
+
+                return;
+
+            }
+
+
+            // ==================================================
+            // UPDATE URL
+            // ==================================================
+
+            updateURL();
+
+
+            // ==================================================
+            // REQUEST ULANG KE API
+            // ==================================================
 
             await loadProducts();
 
@@ -346,11 +535,30 @@ document.addEventListener("DOMContentLoaded", () => {
 
     resetButton.addEventListener(
         "click",
-        async () => {
+        async event => {
+
+            event.preventDefault();
+
 
             searchInput.value = "";
 
             kategoriSelect.value = "";
+
+
+            // ==================================================
+            // UPDATE URL
+            // ==================================================
+
+            window.history.pushState(
+                {},
+                "",
+                "/produk"
+            );
+
+
+            // ==================================================
+            // LOAD SEMUA PRODUK
+            // ==================================================
 
             await loadProducts();
 
@@ -359,15 +567,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     // ======================================================
-    // FILTER SAAT MENGETIK
-    // ENTER TETAP BISA DIGUNAKAN
+    // SEARCH DENGAN ENTER
     // ======================================================
 
     searchInput.addEventListener(
         "keydown",
         event => {
 
-            if (event.key === "Enter") {
+            if (
+                event.key === "Enter"
+            ) {
 
                 event.preventDefault();
 
@@ -377,7 +586,35 @@ document.addEventListener("DOMContentLoaded", () => {
 
         }
     );
-    
+
+
+    // ======================================================
+    // HANDLE BACK/FORWARD BROWSER
+    // ======================================================
+
+    window.addEventListener(
+        "popstate",
+        async () => {
+
+            loadFilterFromURL();
+
+            await loadProducts();
+
+        }
+    );
+
+
+    // ======================================================
+    // LOAD FILTER DARI URL SAAT HALAMAN DIBUKA
+    // ======================================================
+
+    loadFilterFromURL();
+
+
+    // ======================================================
+    // LOAD PRODUK PERTAMA KALI
+    // ======================================================
+
     loadProducts();
 
 });
