@@ -1,10 +1,19 @@
 function requireAuth(req, res, next) {
 
-    if (req.session && req.session.admin) {
+    // ==========================
+    // CEK SESSION ADMIN
+    // ==========================
+    if (
+        req.session &&
+        req.session.admin &&
+        req.session.admin.id
+    ) {
         return next();
     }
 
-    // Jika request berasal dari API
+    // ==========================
+    // REQUEST API
+    // ==========================
     if (req.originalUrl.startsWith("/api/")) {
 
         return res.status(401).json({
@@ -14,7 +23,9 @@ function requireAuth(req, res, next) {
 
     }
 
-    // Jika membuka halaman biasa
+    // ==========================
+    // REQUEST HALAMAN WEB
+    // ==========================
     return res.redirect("/login");
 }
 
