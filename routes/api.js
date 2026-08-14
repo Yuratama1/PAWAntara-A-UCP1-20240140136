@@ -25,9 +25,7 @@ router.post("/login", async (req, res) => {
         }
 
         const admin = await Admin.findOne({
-            where: {
-                username
-            }
+            where: { username }
         });
 
         if (!admin) {
@@ -123,10 +121,7 @@ router.get("/products", async (req, res) => {
 
     } catch (error) {
 
-        console.error(
-            "GET products error:",
-            error
-        );
+        console.error("GET products error:", error);
 
         return res.status(500).json({
             status: "error",
@@ -144,10 +139,7 @@ router.get("/products/:id", async (req, res) => {
 
     try {
 
-        const id = parseInt(
-            req.params.id,
-            10
-        );
+        const id = parseInt(req.params.id, 10);
 
         if (Number.isNaN(id)) {
             return res.status(400).json({
@@ -204,6 +196,9 @@ router.post(
                 stock
             } = req.body;
 
+            // ======================
+            // VALIDASI FIELD WAJIB
+            // ======================
             if (
                 !name ||
                 !category ||
@@ -216,11 +211,70 @@ router.post(
                 });
             }
 
+            // ======================
+            // VALIDASI NAMA
+            // ======================
+            if (
+                typeof name !== "string" ||
+                !name.trim()
+            ) {
+                return res.status(400).json({
+                    status: "error",
+                    message: "Nama produk tidak valid"
+                });
+            }
+
+            // ======================
+            // VALIDASI KATEGORI
+            // ======================
+            if (
+                typeof category !== "string" ||
+                !category.trim()
+            ) {
+                return res.status(400).json({
+                    status: "error",
+                    message: "Kategori produk tidak valid"
+                });
+            }
+
+            // ======================
+            // VALIDASI HARGA
+            // ======================
+            const numericPrice = Number(price);
+
+            if (
+                !Number.isFinite(numericPrice) ||
+                numericPrice < 0
+            ) {
+                return res.status(400).json({
+                    status: "error",
+                    message: "Harga harus berupa angka yang valid dan tidak boleh negatif"
+                });
+            }
+
+            // ======================
+            // VALIDASI STOK
+            // ======================
+            const numericStock = Number(stock);
+
+            if (
+                !Number.isInteger(numericStock) ||
+                numericStock < 0
+            ) {
+                return res.status(400).json({
+                    status: "error",
+                    message: "Stok harus berupa bilangan bulat yang valid dan tidak boleh negatif"
+                });
+            }
+
+            // ======================
+            // CREATE PRODUCT
+            // ======================
             const product = await Product.create({
                 name: name.trim(),
                 category: category.trim(),
-                price: Number(price),
-                stock: Number(stock)
+                price: numericPrice,
+                stock: numericStock
             });
 
             return res.status(201).json({
@@ -231,31 +285,11 @@ router.post(
 
         } catch (error) {
 
-            console.error("POST product error:");
-            console.error(error);
-
-            if (error.errors) {
-                console.error(
-                    "Validation details:",
-                    error.errors.map((item) => ({
-                        message: item.message,
-                        path: item.path,
-                        value: item.value,
-                        validatorKey: item.validatorKey
-                    }))
-                );
-            }
+            console.error("POST product error:", error);
 
             return res.status(500).json({
                 status: "error",
-                message: "Gagal menambahkan produk",
-                error: error.message,
-                details: error.errors
-                    ? error.errors.map((item) => ({
-                        message: item.message,
-                        field: item.path
-                    }))
-                    : []
+                message: "Gagal menambahkan produk"
             });
         }
 
@@ -273,11 +307,11 @@ router.put(
 
         try {
 
-            const id = parseInt(
-                req.params.id,
-                10
-            );
+            const id = parseInt(req.params.id, 10);
 
+            // ======================
+            // VALIDASI ID
+            // ======================
             if (Number.isNaN(id)) {
                 return res.status(400).json({
                     status: "error",
@@ -285,6 +319,9 @@ router.put(
                 });
             }
 
+            // ======================
+            // CEK PRODUK
+            // ======================
             const product = await Product.findByPk(id);
 
             if (!product) {
@@ -301,6 +338,9 @@ router.put(
                 stock
             } = req.body;
 
+            // ======================
+            // VALIDASI FIELD WAJIB
+            // ======================
             if (
                 !name ||
                 !category ||
@@ -313,11 +353,70 @@ router.put(
                 });
             }
 
+            // ======================
+            // VALIDASI NAMA
+            // ======================
+            if (
+                typeof name !== "string" ||
+                !name.trim()
+            ) {
+                return res.status(400).json({
+                    status: "error",
+                    message: "Nama produk tidak valid"
+                });
+            }
+
+            // ======================
+            // VALIDASI KATEGORI
+            // ======================
+            if (
+                typeof category !== "string" ||
+                !category.trim()
+            ) {
+                return res.status(400).json({
+                    status: "error",
+                    message: "Kategori produk tidak valid"
+                });
+            }
+
+            // ======================
+            // VALIDASI HARGA
+            // ======================
+            const numericPrice = Number(price);
+
+            if (
+                !Number.isFinite(numericPrice) ||
+                numericPrice < 0
+            ) {
+                return res.status(400).json({
+                    status: "error",
+                    message: "Harga harus berupa angka yang valid dan tidak boleh negatif"
+                });
+            }
+
+            // ======================
+            // VALIDASI STOK
+            // ======================
+            const numericStock = Number(stock);
+
+            if (
+                !Number.isInteger(numericStock) ||
+                numericStock < 0
+            ) {
+                return res.status(400).json({
+                    status: "error",
+                    message: "Stok harus berupa bilangan bulat yang valid dan tidak boleh negatif"
+                });
+            }
+
+            // ======================
+            // UPDATE PRODUCT
+            // ======================
             await product.update({
                 name: name.trim(),
                 category: category.trim(),
-                price: Number(price),
-                stock: Number(stock)
+                price: numericPrice,
+                stock: numericStock
             });
 
             return res.status(200).json({
@@ -328,10 +427,7 @@ router.put(
 
         } catch (error) {
 
-            console.error(
-                "PUT product error:",
-                error
-            );
+            console.error("PUT product error:", error);
 
             return res.status(500).json({
                 status: "error",
@@ -353,10 +449,7 @@ router.delete(
 
         try {
 
-            const id = parseInt(
-                req.params.id,
-                10
-            );
+            const id = parseInt(req.params.id, 10);
 
             if (Number.isNaN(id)) {
                 return res.status(400).json({
@@ -399,15 +492,17 @@ router.delete(
 
     }
 );
+
 // ======================
 // POST /api/chat
 // PUBLIC - DUMMY AI
 // ======================
 router.post("/chat", async (req, res) => {
+
     try {
+
         const { question } = req.body;
 
-        // Validasi pertanyaan
         if (!question || !question.trim()) {
             return res.status(400).json({
                 status: "error",
@@ -429,8 +524,10 @@ router.post("/chat", async (req, res) => {
             lowerQuestion.includes("jam berapa") ||
             lowerQuestion.includes("buka")
         ) {
+
             answer =
                 "Toko Ariesta buka setiap hari pukul 08.00 sampai 21.00.";
+
         }
 
         // ======================
@@ -442,8 +539,10 @@ router.post("/chat", async (req, res) => {
             lowerQuestion.includes("pengantaran") ||
             lowerQuestion.includes("delivery")
         ) {
+
             answer =
                 "Untuk informasi ongkir dan area pengantaran, silakan hubungi Toko Ariesta secara langsung.";
+
         }
 
         // ======================
@@ -454,8 +553,10 @@ router.post("/chat", async (req, res) => {
             lowerQuestion.includes("pembayaran") ||
             lowerQuestion.includes("payment")
         ) {
+
             answer =
                 "Toko Ariesta menerima pembayaran sesuai metode pembayaran yang tersedia di toko.";
+
         }
 
         // ======================
@@ -466,11 +567,11 @@ router.post("/chat", async (req, res) => {
             lowerQuestion.includes("tersedia") ||
             lowerQuestion.includes("ada")
         ) {
+
             const products = await Product.findAll({
                 order: [["name", "ASC"]]
             });
 
-            // Cari produk berdasarkan nama
             const matchedProduct = products.find(product =>
                 lowerQuestion.includes(
                     product.name.toLowerCase()
@@ -478,39 +579,52 @@ router.post("/chat", async (req, res) => {
             );
 
             if (matchedProduct) {
+
                 if (matchedProduct.stock > 0) {
+
                     answer =
                         `${matchedProduct.name} masih tersedia dengan stok ${matchedProduct.stock} item.`;
+
                 } else {
+
                     answer =
                         `${matchedProduct.name} sedang tidak tersedia karena stok habis.`;
                 }
+
             } else {
-                const availableProducts = products.filter(
-                    product => product.stock > 0
-                );
+
+                const availableProducts =
+                    products.filter(
+                        product => product.stock > 0
+                    );
 
                 if (availableProducts.length === 0) {
+
                     answer =
                         "Saat ini belum ada produk yang tersedia.";
+
                 } else {
-                    const productList = availableProducts
-                        .slice(0, 5)
-                        .map(product =>
-                            `${product.name} (stok ${product.stock})`
-                        )
-                        .join(", ");
+
+                    const productList =
+                        availableProducts
+                            .slice(0, 5)
+                            .map(product =>
+                                `${product.name} (stok ${product.stock})`
+                            )
+                            .join(", ");
 
                     answer =
                         `Beberapa produk yang tersedia saat ini: ${productList}.`;
                 }
             }
+
         }
 
         // ======================
         // DEFAULT
         // ======================
         else {
+
             answer =
                 "Maaf, saya belum memahami pertanyaan tersebut. Kamu bisa bertanya tentang jam buka, stok produk, pengantaran, atau pembayaran.";
         }
@@ -525,6 +639,7 @@ router.post("/chat", async (req, res) => {
         });
 
     } catch (error) {
+
         console.error("Chat error:", error);
 
         return res.status(500).json({
@@ -532,6 +647,7 @@ router.post("/chat", async (req, res) => {
             message: "Gagal memproses pertanyaan"
         });
     }
+
 });
 
 module.exports = router;
